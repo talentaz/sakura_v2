@@ -1,0 +1,11 @@
+.detail-wrapper {
+    margin: auto;
+}
+.car-feature .form-check-input[type=checkbox] {
+    width: 1.2em;
+    height: 1.2em;
+    margin-right: 5px;
+}
+.fileinput-upload-button {
+    display: none !important;
+}
