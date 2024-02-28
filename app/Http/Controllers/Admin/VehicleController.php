@@ -393,8 +393,12 @@ class VehicleController extends Controller
         $rate->save();
         return response()->json(['result' => true, 'Updated rate' => $rate]);
     }
+    public function get_status(Request $request){
+        $status = Vehicle::select('status', 'count_time')->where('id', $request->id)->first();
+        return response()->json(['result' => $status]);
+    }
     public function change_status(Request $request){
-        Vehicle::where('id', $request->id)->update(['status' => $request->status]);
+        Vehicle::where('id', $request->id)->update(['status' => $request->status, 'count_time' => $request->count_time]);
         return response()->json(['result' => true]);
     }
     public function image_all_delete(Request $request){

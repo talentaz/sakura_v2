@@ -60,16 +60,28 @@
                         aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label class="col-form-label">Order Satus:</label>
+                    <div class="order-status">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="col-form-label">Order Satus:</label>
+                            </div>
+                            <div class="col-md-8">
+                                <select class="form-select select-status">
+                                    @foreach($order_status as $row)
+                                        <option value="{{$row}}">{{$row}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-md-8">
-                            <select class="form-select select-status">
-                                @foreach($order_status as $row)
-                                    <option value="{{$row}}">{{$row}}</option>
-                                @endforeach
-                            </select>
+                    </div>
+                    <div class="count-time mt-4">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="col-form-label">Count Time(hr):</label>
+                            </div>
+                            <div class="col-md-8">
+                                <input class="form-control" type="number"  name="count_time" >
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -94,6 +106,7 @@
         var index_url = "{{route('admin.vehicle.index')}}";
         var change_status = "{{route('admin.vehicle.change_status')}}";
         var get_data = "{{ route('admin.vehicle.get_data')}}"
+        var get_status = "{{ route('admin.vehicle.get_status')}}"
     </script>
     <script src="{{ URL::asset('/assets/admin/pages/vehicle/index.js') }}"></script>
 @endsection

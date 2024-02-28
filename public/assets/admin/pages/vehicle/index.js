@@ -122,27 +122,60 @@ $(document).ready(function () {
             })
         })
     })
+    
     $('.datatable').on('click', '.confirm_status', function(e){
         e.preventDefault();
         e.stopPropagation();
         var id = $(this).data('id');
+        $.ajaxSetup({
+            headers: {
+              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.ajax({
+            url: get_status,
+            method: 'get',
+            data: {id:id},
+            success: function (data){
+                $( ".select-status" ).val(data.result.status);
+                $( ".count-time input" ).val(data.result.count_time);
+                if (data.result.status === "Invoice Issued") {
+                    $(".count-time").show();
+                } else {
+                    $(".count-time").hide();
+                }
+            }
+        })
+        $(".select-status").change(function() {
+            var status = $( ".select-status option:selected" ).text();
+            if (status === "Invoice Issued") {
+                $(".count-time").show();
+            } else {
+                $(".count-time").hide();
+            }
+        });
         $('.save_button').click(function(){
             var status = $( ".select-status option:selected" ).text();
-            $.ajaxSetup({
-                headers: {
-                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-            $.ajax({
-                url: change_status,
-                method: 'get',
-                data: {id:id, status:status},
-                success: function (data){
-                    toastr["success"]("Success");
-                    $('#exampleModalScrollable').modal('hide');
-                    table.ajax.reload();
-                }
-            })
+            var count_time = $( ".count-time input" ).val();
+            if (status == "Invoice Issued" && count_time == "") {
+                alert("Please insert 'Count Time'")
+            } else {
+                $.ajaxSetup({
+                    headers: {
+                      'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+                $.ajax({
+                    url: change_status,
+                    method: 'get',
+                    data: {id:id, status:status, count_time:count_time},
+                    success: function (data){
+                        toastr["success"]("Success");
+                        $('#exampleModalScrollable').modal('hide');
+                        table.ajax.reload();
+                    }
+                })
+            }
         })
     })
 })
