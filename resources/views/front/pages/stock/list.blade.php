@@ -102,6 +102,7 @@
                 @if($row->status == "Invoice Issued")
                 <div class="under-offer">
                     <h3>Under Offer</h3>
+                    @if($result > 0)
                     <p class="remaining-time" data-time="{{ $result }}">
                         Available in: 
                         <!-- <span class="hour-time"></span>
@@ -111,6 +112,7 @@
                         <span class="sec-time"></span>
                         <span class="symbol">s,</span> -->
                     </p>
+                    @endif
                     <a class="nofity-signup" href="{{route('front.user.signup')}}">NOTIFY ME WHEN AVAILABLE</a>
                 </div>
                 @else
