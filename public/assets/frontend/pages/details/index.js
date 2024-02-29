@@ -312,3 +312,27 @@ function mb_price_calc(){
 function capitalizeFirstLetter(string){
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
+
+
+function countDownTimer() {
+    // Get all elements with class 'remaining-time'
+    var remainingTimeElement = $('.remaining-time');
+    
+    var remainingTime = parseInt(remainingTimeElement.attr('data-time'));
+        
+    // Calculate hours, minutes, and seconds
+    var hours = ("0" + Math.floor(remainingTime / 3600)).slice(-2);
+    var minutes = ("0" + Math.floor((remainingTime % 3600) / 60)).slice(-2);
+    var seconds = ("0" + remainingTime % 60).slice(-2);
+    
+    // Update the content of the element with the countdown timer
+    remainingTimeElement.html('Available in: ' + '<span class="time">'+ hours + '</span>' + '<span class="symbol"> h, </span>' + '<span class="time">'+ minutes + '</span>' + '<span class="symbol"> m, </span>' + '<span class="time">'+ seconds + '</span>' + '<span class="symbol"> s</span>');
+    
+    // Decrease remaining time by 1 second
+    remainingTime--;
+    
+    // Update the data-time attribute to reflect the new remaining time
+    remainingTimeElement.attr('data-time', remainingTime);
+}
+
+setInterval(countDownTimer, 1000);

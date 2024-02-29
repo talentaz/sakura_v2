@@ -92,6 +92,28 @@
                 <input type="hidden" class="mobile-body-type" value="{{$row->body_type}}">
             </div>
             <div class="stock-price-list">
+                @php 
+                    $now = Carbon\Carbon::now();
+                    $countTime = $row->count_time;
+                    $updatedAt = Carbon\Carbon::parse($row->updated_at);
+                    $diffTime = $now->diffInSeconds($updatedAt); 
+                    $result = $countTime*3600 - $diffTime;
+                @endphp
+                @if($row->status == "Invoice Issued")
+                <div class="under-offer">
+                    <h3>Under Offer</h3>
+                    <p class="remaining-time" data-time="{{ $result }}">
+                        Available in: 
+                        <!-- <span class="hour-time"></span>
+                        <span class="symbol">h,</span>
+                        <span class="min-time"></span>
+                        <span class="symbol">m,</span>
+                        <span class="sec-time"></span>
+                        <span class="symbol">s,</span> -->
+                    </p>
+                    <a class="nofity-signup" href="{{route('front.user.signup')}}">NOTIFY ME WHEN AVAILABLE</a>
+                </div>
+                @else
                 <div class="fob-price">
                     <input type="hidden" class="cubic-meter" value="{{($row->length * $row->width * $row->height)/1000000}}">
                     @if($row->sale_price==null)
@@ -120,6 +142,7 @@
                     <a target="_blank" href="{{route('front.details', ['id' => $row->id])}}" data-contents="{{route('front.details', ['id' => $row->id])}}" class="btn-detail">Details</a>
                     <a target="_blank" href="{{route('front.details', ['id' => $row->id])}}" class="btn-inquire">Inquire</a>
                 </div>
+                @endif
             </div>
         </div>
     @endforeach
@@ -140,3 +163,33 @@
     </h3>
     @endif
 @endif
+
+<script>
+    function countDownTimer() {
+        // Get all elements with class 'remaining-time'
+        var remainingTimeElements = document.getElementsByClassName('remaining-time');
+        
+        // Loop through each element and update the countdown timer
+        for (var i = 0; i < remainingTimeElements.length; i++) {
+            var remainingTimeElement = remainingTimeElements[i];
+            var remainingTime = parseInt(remainingTimeElement.getAttribute('data-time'));
+            
+            // Calculate hours, minutes, and seconds
+            var hours = ("0" + Math.floor(remainingTime / 3600)).slice(-2);
+            var minutes = ("0" + Math.floor((remainingTime % 3600) / 60)).slice(-2);
+            var seconds = ("0" + remainingTime % 60).slice(-2);
+            
+            // Update the content of the element with the countdown timer
+            remainingTimeElement.innerHTML = 'Available in: ' + '<span class="time">'+ hours + '</span>' + '<span class="symbol"> h, </span>' + '<span class="time">'+ minutes + '</span>' + '<span class="symbol"> m, </span>' + '<span class="time">'+ seconds + '</span>' + '<span class="symbol"> s</span>';
+            
+            // Decrease remaining time by 1 second
+            remainingTime--;
+            
+            // Update the data-time attribute to reflect the new remaining time
+            remainingTimeElement.setAttribute('data-time', remainingTime);
+        }
+    }
+    
+    // Update countdown timer every second
+    var timer = setInterval(countDownTimer, 1000);
+</script>

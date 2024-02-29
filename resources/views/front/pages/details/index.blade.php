@@ -31,6 +31,29 @@ $last = end($explode);
     <div class="contents-details">
         <!-- mobile -->
         <div class="detail-sidebar mobile-sidebar">
+        @php 
+                
+                $now = Carbon\Carbon::now();
+                $countTime = $vehicle_data->count_time;
+                $updatedAt = Carbon\Carbon::parse($vehicle_data->updated_at);
+                $diffTime = $now->diffInSeconds($updatedAt); 
+                $result = $countTime*3600 - $diffTime;
+            @endphp
+            @if($vehicle_data->status == "Invoice Issued")
+            <div class="under-offer">
+                <h3>Under Offer</h3>
+                <p class="remaining-time" data-time="{{ $result }}">
+                    Available in: 
+                    <!-- <span class="hour-time"></span>
+                    <span class="symbol">h,</span>
+                    <span class="min-time"></span>
+                    <span class="symbol">m,</span>
+                    <span class="sec-time"></span>
+                    <span class="symbol">s,</span> -->
+                </p>
+                <a class="nofity-signup" href="{{route('front.user.signup')}}">NOTIFY ME WHEN AVAILABLE</a>
+            </div>
+            @endif
             <!-- price calculator -->
             <div class="price-calculator">
                 <div class="calc-title">
@@ -494,6 +517,29 @@ $last = end($explode);
             @endif
         </div><!-- /end mobile -->
         <div class="detail-sidebar pc-sidebar">
+                @php 
+                
+                    $now = Carbon\Carbon::now();
+                    $countTime = $vehicle_data->count_time;
+                    $updatedAt = Carbon\Carbon::parse($vehicle_data->updated_at);
+                    $diffTime = $now->diffInSeconds($updatedAt); 
+                    $result = $countTime*3600 - $diffTime;
+                @endphp
+                @if($vehicle_data->status == "Invoice Issued")
+                <div class="under-offer">
+                    <h3>Under Offer</h3>
+                    <p class="remaining-time" data-time="{{ $result }}">
+                        Available in: 
+                        <!-- <span class="hour-time"></span>
+                        <span class="symbol">h,</span>
+                        <span class="min-time"></span>
+                        <span class="symbol">m,</span>
+                        <span class="sec-time"></span>
+                        <span class="symbol">s,</span> -->
+                    </p>
+                    <a class="nofity-signup" href="{{route('front.user.signup')}}">NOTIFY ME WHEN AVAILABLE</a>
+                </div>
+                @endif
             <!-- price calculator -->
             <div class="price-calculator">
                 <div class="calc-title">
