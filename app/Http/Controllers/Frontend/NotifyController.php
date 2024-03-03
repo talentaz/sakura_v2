@@ -8,7 +8,7 @@ use App\Models\OrderStatus;
 use App\Models\Vehicle;
 use App\Models\User;
 use Carbon\Carbon;
-
+use Mail, DB;
 
 class NotifyController extends Controller
 {
@@ -45,7 +45,7 @@ class NotifyController extends Controller
                 Vehicle::where('id', $row->vehicle_id)->update(['notify_status' => 1]);
             }
         }     
-                                       
+
         return response()->json(['result' => true]);
     }
 }
