@@ -458,6 +458,18 @@
                 <p><a href="https://sakuramotors.com/">Sakuramotors.com</a></p>
                 </td>
             </tr>
+            @elseif($is_contact == 'auto')
+              <p>Dear, {{$name}}</p>
+              <p>Thank you for your inquiry.</p>
+              <p>The vehicle you requested is available for sale. Are you still interested in purchasing it?</p>
+              <p>Thank you</p><br>
+              <a href="https://sakuramotors.com/">Sakura Motors Co.Ltd.</a><br>
+              <p>Address : 3-48-48, Gakuen Minami, Tsukuba-Shi,</p>
+              <p>Ibaraki Prefecture, Japan 305-0818.</p>
+              <p>E-mail : <a href="mailto:info@sakuramotors.com">info@sakuramotors.com</a></p>
+              <p>Tel : <a href="tel:+81298190850"> +81-29-819-0850</a></p>
+              <p>Fax : <a href="tel:+81298683669">+81-29-868-3669</a></p>
+              <p>WhatsApp : <a href="https://wa.me/819093450908">+81-90-9345-0908</a></p>
             @else
             <tr>
                 <td>
