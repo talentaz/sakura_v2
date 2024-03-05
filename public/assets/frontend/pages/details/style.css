@@ -218,6 +218,11 @@ body {
 .under-offer a:hover {
     opacity: 0.85;
 }
+.added-notify {
+    text-align: center;
+    color: #3366cc;
+    font-weight: bold;
+}
 .detail-sidebar {
     width: 29%;
     float: right;

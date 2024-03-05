@@ -113,7 +113,19 @@
                         <span class="symbol">s,</span> -->
                     </p>
                     @endif
-                    <a class="nofity-signup" href="{{route('front.user.signup')}}">NOTIFY ME WHEN AVAILABLE</a>
+                    @if(Auth::user() && Auth::user()->role == 2)
+                        @php
+                            $user_id = Auth::user()->id;
+                            $notify = App\Models\Notify::where('user_id', $user_id)->where('vehicle_id', $row->id)->first();
+                        @endphp
+                        @if($notify)
+                        <p class="added-notify">Added to NOTIFY ME</p>
+                        @else
+                            <a class="nofity-signup add-notify" href="javascript:void()"  data-vehicle-id="{{ $row->id }}"  data-user-id="{{ $user_id }}" >Inform me when it's available</a>    
+                        @endif
+                    @else
+                        <a class="nofity-signup" href="{{route('front.user.signup')}}">Inform me when it's available</a>
+                    @endif
                 </div>
                 @else
                 <div class="fob-price">

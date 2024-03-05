@@ -92,6 +92,27 @@ $(document).ready(function () {
             console.log('Server error occured');
         });
     })
+    $('.add-notify').click(function(e) {
+        e.preventDefault();
+        var vehicleId = $(this).data('vehicle-id');
+        var userId = $(this).data('user-id');   
+        $.ajax({
+            url: '/notify/create',
+            method: 'get',
+            data: { user_id: userId, vehicle_id: vehicleId },
+            success: function(res) {
+                if(res.result) {
+                    toastr["success"]("Added. You will be notified when the vehicle becomes available.");
+                    $(e.target).after('<p class="added-notify">Added to NOTIFY ME</p>');
+                    $(e.target).remove(); // Remove the anchor tag after adding the notification
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('An error occurred while adding notification.');
+                console.error(xhr.responseText);
+            }
+        });     
+    })
     $(document).on('click', '.image-count', function(e){
         e.preventDefault();
         e.stopPropagation();

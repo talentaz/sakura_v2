@@ -161,8 +161,10 @@ Route::prefix('/admin')->middleware(['auth:web', 'Admin'])->group(function () {
     Route::get('/edit_profile', [App\Http\Controllers\Admin\AdminController::class, 'edit_profile'])->name('admin.edit_profile');
     Route::post('/update_profile', [App\Http\Controllers\Admin\AdminController::class, 'update_profile'])->name('admin.update_profile');
 });
-
-Route::get('/notify', [App\Http\Controllers\Frontend\NotifyController::class, 'index'])->name('auto.email');
+Route::group(['prefix' => 'notify'], function(){
+    Route::get('/', [App\Http\Controllers\Frontend\NotifyController::class, 'index'])->name('auto.email');
+    Route::get('/create', [App\Http\Controllers\Frontend\NotifyController::class, 'create'])->name('notify.create');
+});
 
 //Update User Details
 Route::post('/update-profile/{id}', [App\Http\Controllers\HomeController::class, 'updateProfile'])->name('updateProfile');
