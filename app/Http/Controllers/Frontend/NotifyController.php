@@ -42,6 +42,7 @@ class NotifyController extends Controller
                     'is_contact' => 'auto',
                     'subject' => $subject,
                     'name' => $name,
+                    'vehicle_id' => $row->vehicle_id,
                 ), function($message) use ($email, $subject){
                     $message->from('info@sakuramotors.com');
                     $message->to($email, $subject)
