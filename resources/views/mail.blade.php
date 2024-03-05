@@ -462,7 +462,7 @@
               <p>Dear, {{$name}}</p>
               <p>Thank you for your inquiry.</p>
               <p>The vehicle you requested is available for sale. Are you still interested in purchasing it?</p>
-              <a target="_blank" href="{{route('front.details', ['id' => $vehicle_id])}}"></a>
+              <a target="_blank" href="{{route('front.details', ['id' => $vehicle_id])}}">{{route('front.details', ['id' => $vehicle_id])}}</a>
               <p>Thank you</p><br>
               <a href="https://sakuramotors.com/">Sakura Motors Co.Ltd.</a><br>
               <p>Address : 3-48-48, Gakuen Minami, Tsukuba-Shi,</p>
