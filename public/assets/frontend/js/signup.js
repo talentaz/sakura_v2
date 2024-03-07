@@ -15,10 +15,20 @@ $('form#myForm').submit(function(e){
             if(res == 'exist'){
                 toastr["warning"]("Exist Email.");
             } else {
-                toastr["success"]("Success");
-                setInterval(function(){ 
-                    location.href = login_url; 
-                }, 2000);
+                if(res=="notify") {
+                    toastr["success"]("Added. You will be notified when the vehicle becomes available.");
+                    setInterval(function(){ 
+                        location.href = stock_url; 
+                    }, 2000);
+                } else {
+                    alert()
+                    toastr["success"]("Success");
+                    setInterval(function(){ 
+                        location.href = login_url; 
+                    }, 2000);
+                }
+                
+                
             }
         },
         error: function (res){

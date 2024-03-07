@@ -122,31 +122,34 @@ $last = end($explode);
                     <h3>{{$vehicle_data->make_type}} {{$vehicle_data->model_type}} {{$vehicle_data->body_type}}</h3>
                     <div class="vehicle-name-border"></div>
                 </div>
-                <div class="vehicle-price">
-                    <div class="price-info">
-                        @if($vehicle_data->sale_price)
-                            <div class="original-price">Original Price ${{number_format(round($vehicle_data->price/$rate->rate))}}</div>
-                        @endif
-                        <div class="fob-price">
-                            <h3 class="fob-label">Price (Fob)</h3>
-                            <input type="hidden" class="cubic-meter" value="{{($vehicle_data->width*$vehicle_data->length*$vehicle_data->height)/1000000}}">
-                            @if($vehicle_data->sale_price==null)
-                                <input type="hidden" class="price" value="{{round($vehicle_data->price/$rate->rate)}}"/>
-                                <h3 class="fob-value">${{number_format(round($vehicle_data->price/$rate->rate))}}</h3>
-                            @else                                
-                                <input type="hidden" class="price" value="{{round($vehicle_data->sale_price/$rate->rate)}}"/>
-                                <h3 class="fob-value">${{number_format(round($vehicle_data->sale_price/$rate->rate))}}</h3>
+                @if($vehicle_data->status != "Invoice Issued")
+                    <div class="vehicle-price">
+                        <div class="price-info">
+                            @if($vehicle_data->sale_price)
+                                <div class="original-price">Original Price ${{number_format(round($vehicle_data->price/$rate->rate))}}</div>
                             @endif
-                        </div>
-                        <div class="total-price">
-                            <h5 class="total-price-label">Total Price</h5>
-                            <h5 class="total-price-value">{{!$total_price=='' ? $total_price:'ASK'}}</h5>
-                        </div>
-                        <div class="ml-2 cif">
-                            <p></p>
+                            <div class="fob-price">
+                                <h3 class="fob-label">Price (Fob)</h3>
+                                <input type="hidden" class="cubic-meter" value="{{($vehicle_data->width*$vehicle_data->length*$vehicle_data->height)/1000000}}">
+                                @if($vehicle_data->sale_price==null)
+                                    <input type="hidden" class="price" value="{{round($vehicle_data->price/$rate->rate)}}"/>
+                                    <h3 class="fob-value">${{number_format(round($vehicle_data->price/$rate->rate))}}</h3>
+                                @else                                
+                                    <input type="hidden" class="price" value="{{round($vehicle_data->sale_price/$rate->rate)}}"/>
+                                    <h3 class="fob-value">${{number_format(round($vehicle_data->sale_price/$rate->rate))}}</h3>
+                                @endif
+                            </div>
+                            <div class="total-price">
+                                <h5 class="total-price-label">Total Price</h5>
+                                <h5 class="total-price-value">{{!$total_price=='' ? $total_price:'ASK'}}</h5>
+                            </div>
+                            <div class="ml-2 cif">
+                                <p></p>
+                            </div>
                         </div>
                     </div>
-                </div>
+                @endif
+
             </div>
             <!-- -->
             <div class="slick-wrapper">

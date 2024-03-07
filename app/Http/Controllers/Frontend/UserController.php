@@ -18,6 +18,7 @@ use App\Models\Comments;
 use App\Models\Reply;
 use App\Models\Vehicle;
 use App\Models\VehicleImage;
+use App\Models\Notify;
 
 
 class UserController extends Controller
@@ -37,9 +38,11 @@ class UserController extends Controller
         }
         $country_ip = \Location::get($ip);
         $current_country = Port::where('country', 'LIKE', "%{$country_ip->countryName}%")->first()->country;
+        $vehicle_id = $request->input('vehicle_id');
         return view('front.pages.user.signup', [
             'country' => $country,
             'current_country' => $current_country,
+            'vehicle_id' => $vehicle_id,
         ]);
     }
     public function signup_post(Request $request) {
@@ -57,6 +60,41 @@ class UserController extends Controller
             $result->role = 2;
             // $result->real_password = $request->password;
             $result->save();
+
+            $vehicle_id = $request->vehicle_id;
+
+            // save notify vehicle data to notify table
+            if($vehicle_id){
+                $user_id = User::where('email', $request->email)->first()->id;
+                $notify = new Notify;
+                $notify->user_id = $user_id;
+                $notify->vehicle_id = $vehicle_id;
+                $notify->save();
+            }
+            // auto login after signup
+            if ($request->session()->has('redirectTo')) {
+                $redirectURL = $request->session()->get('redirectTo');
+            } else {
+                $redirectURL = null;
+            }
+            $credentials = $request->only('email', 'password'); 
+            if (Auth::guard('web')->attempt($credentials) == 'true') {
+                // otherwise, redirect auth user to next url
+                if ($redirectURL == null) {
+                    if($vehicle_id){
+                        return 'notify';    
+                    }
+                    return 'success';
+                    // return redirect()->route('front.user.dashboard');
+                } else {
+                    // before, redirect to next url forget the session value
+                    $request->session()->forget('redirectTo');
+                    return redirect($redirectURL);
+                }
+            } else {
+                $request->session()->flash('error', 'The provided credentials do not match our records!');
+                return redirect()->back();
+            }
         }
     }
     public function login_post(Request $request) {

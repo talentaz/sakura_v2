@@ -35,6 +35,7 @@
                                 <div class="p-2">
                                     <form id="myForm" method="post" enctype="multipart/form-data">
                                         @csrf
+                                        <input type="hidden" name="vehicle_id" value="{{$vehicle_id}}">
                                         <div class="mb-3">
                                             <label for="username" class="form-label">Full Name</label>
                                             <input name="name" type="text" class="form-control" placeholder="Enter Full Name" required>
@@ -101,6 +102,7 @@
 <script>
     create_url = "{{route('front.user.signup_post')}}";
     login_url = "{{route('front.user.login')}}";
+    stock_url = "{{route('front.stock')}}";
 </script>
 <script src="{{ URL::asset('/assets/frontend/js/signup.js') }}"></script>
 @endsection

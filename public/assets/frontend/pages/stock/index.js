@@ -92,7 +92,7 @@ $(document).ready(function () {
             console.log('Server error occured');
         });
     })
-    $('.add-notify').click(function(e) {
+    $(document).on('click' ,'.add-notify', function(e) {
         e.preventDefault();
         var vehicleId = $(this).data('vehicle-id');
         var userId = $(this).data('user-id');   
