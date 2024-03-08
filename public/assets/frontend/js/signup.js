@@ -27,8 +27,6 @@ $('form#myForm').submit(function(e){
                         location.href = login_url; 
                     }, 2000);
                 }
-                
-                
             }
         },
         error: function (res){

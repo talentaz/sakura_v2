@@ -84,7 +84,7 @@
                                         </div>
                                     </form>
                                     <div class="mt-4 text-center">
-                                        <a href="{{ route('front.user.login') }}" class="text-muted">Already have an account?</a>
+                                        <a href="{{ route('front.user.login', ['vehicle_id' => $vehicle_id])}}" class="text-muted">Already have an account?</a>
                                     </div>
                                 </div>
 

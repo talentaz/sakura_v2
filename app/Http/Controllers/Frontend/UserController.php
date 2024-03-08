@@ -25,8 +25,9 @@ class UserController extends Controller
 {
     public function login(Request $request)
     {
+        $vehicle_id = $request->input('vehicle_id');
         return view('front.pages.user.login', [
-            // 'data' => $data,
+            'vehicle_id' => $vehicle_id,
         ]);
     }
     public function signup(Request $request)
@@ -107,8 +108,19 @@ class UserController extends Controller
         $credentials = $request->only('email', 'password');
         // login attempt
         if (Auth::guard('web')->attempt($credentials) == 'true') {
+            $vehicle_id = $request->vehicle_id;
+            if($vehicle_id){
+                $user_id = User::where('email', $request->email)->first()->id;
+                $notify = new Notify;
+                $notify->user_id = $user_id;
+                $notify->vehicle_id = $vehicle_id;
+                $notify->save();
+            }
             // otherwise, redirect auth user to next url
             if ($redirectURL == null) {
+                if($vehicle_id){
+                    return 'notify';    
+                }
                 return 'success';
                 // return redirect()->route('front.user.dashboard');
             } else {

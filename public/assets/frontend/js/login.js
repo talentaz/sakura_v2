@@ -12,10 +12,16 @@ $('form#myForm').submit(function(e){
         method: 'post',
         data: formData,
         success: function (res) {
-            if(res == 'success'){
-                toastr["success"]("Success!!!");
+            if(res=="notify") {
+                toastr["success"]("Added. You will be notified when the vehicle becomes available.");
                 setInterval(function(){ 
-                    location.href = mypage_url; 
+                    location.href = stock_url; 
+                }, 2000);
+            } else if(res=="notify"){
+                alert()
+                toastr["success"]("Success");
+                setInterval(function(){ 
+                    location.href = login_url; 
                 }, 2000);
             } else {
                 toastr["error"]("The provided credentials do not match our records");

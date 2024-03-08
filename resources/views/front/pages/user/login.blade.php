@@ -52,6 +52,7 @@
                                 <div class="p-2">
                                     <form id="myForm" method="post" enctype="multipart/form-data">
                                         @csrf
+                                        <input type="hidden" name="vehicle_id" value="{{$vehicle_id}}">
                                         <div class="mb-3">
                                             <label for="username" class="form-label">Email</label>
                                             <input name="email" type="email"
@@ -119,6 +120,7 @@
     <script>
         login_url = "{{route('front.user.login_post')}}";
         mypage_url = "{{route('front.user.mypage')}}";
+        stock_url = "{{route('front.stock')}}";
     </script>
     <script src="{{ URL::asset('/assets/frontend/js/login.js') }}"></script>
     @endsection
