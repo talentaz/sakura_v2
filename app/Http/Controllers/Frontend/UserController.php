@@ -62,16 +62,9 @@ class UserController extends Controller
             // $result->real_password = $request->password;
             $result->save();
 
-            $vehicle_id = $request->vehicle_id;
+            
 
-            // save notify vehicle data to notify table
-            if($vehicle_id){
-                $user_id = User::where('email', $request->email)->first()->id;
-                $notify = new Notify;
-                $notify->user_id = $user_id;
-                $notify->vehicle_id = $vehicle_id;
-                $notify->save();
-            }
+            
             // auto login after signup
             if ($request->session()->has('redirectTo')) {
                 $redirectURL = $request->session()->get('redirectTo');
@@ -80,6 +73,15 @@ class UserController extends Controller
             }
             $credentials = $request->only('email', 'password'); 
             if (Auth::guard('web')->attempt($credentials) == 'true') {
+                $vehicle_id = $request->vehicle_id;
+                // save notify vehicle data to notify table
+                if($vehicle_id){
+                    $user_id = User::where('email', $request->email)->first()->id;
+                    $notify = new Notify;
+                    $notify->user_id = $user_id;
+                    $notify->vehicle_id = $vehicle_id;
+                    $notify->save();
+                }
                 // otherwise, redirect auth user to next url
                 if ($redirectURL == null) {
                     if($vehicle_id){
