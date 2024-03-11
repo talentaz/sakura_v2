@@ -75,8 +75,8 @@ $(document).ready(function () {
                     data: {id:id, status:status, count_time:count_time, user_id:user_id},
                     success: function (data){
                         toastr["success"]("Success");
-                        $('#exampleModalScrollable').modal('hide');
-                        table.ajax.reload();
+                        $('#myModal').modal('hide');
+                        location.href = window.location.href; 
                     }
                 })
             }
