@@ -50,7 +50,7 @@
                                                 <ul class="list-inline user-chat-nav text-end mb-0">
                                                     <li class="list-inline-item d-none d-sm-inline-block">
                                                         <div class="dropdown">
-                                                            <a href="javascript:void(0);" data-id="{{$stock_info->vehicle_id}}" data-user = {{$user_id}} class="btn nav-btn status" data-bs-toggle="modal" data-bs-target="#myModal">
+                                                            <a href="javascript:void(0);" data-id="{{$stock_info->vehicle_id}}" data-user = {{$user_id}} class="btn nav-btn status confirm_status" data-bs-toggle="modal" data-bs-target="#myModal">
                                                                 <i class="bx bx-cog"></i>
                                                             </a>
                                                         </div>
@@ -156,16 +156,28 @@
                         aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label class="col-form-label">Order Satus:</label>
+                    <div class="order-status">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="col-form-label">Order Satus:</label>
+                            </div>
+                            <div class="col-md-8">
+                                <select class="form-select select-status">
+                                    @foreach($order_status as $row)
+                                        <option value="{{$row}}">{{$row}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
-                        <div class="col-md-8">
-                            <select class="form-select select-status">
-                                @foreach($order_status as $row)
-                                    <option value="{{$row}}" {{$stock_info->order_status == $row ? 'selected': ''}}>{{$row}}</option>
-                                @endforeach
-                            </select>
+                    </div>
+                    <div class="count-time mt-4">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="col-form-label">Count Time(hr):</label>
+                            </div>
+                            <div class="col-md-8">
+                                <input class="form-control" type="number"  name="count_time" >
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -182,6 +194,7 @@
     <script>
         create_url = "{{route('admin.shipping.reply')}}";
         change_status = "{{route('admin.shipping.change_status')}}";
+        get_status = "{{ route('admin.vehicle.get_status')}}"
         order_status = '{{$stock_info->order_status}}';
         
         if(order_status == 'Inquiry'){

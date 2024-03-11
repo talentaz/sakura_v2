@@ -398,7 +398,12 @@ class VehicleController extends Controller
         return response()->json(['result' => $status]);
     }
     public function change_status(Request $request){
-        Vehicle::where('id', $request->id)->update(['status' => $request->status, 'count_time' => $request->count_time]);
+        Vehicle::where('id', $request->id)
+                ->update([
+                    'status' => $request->status,
+                    'count_time' => $request->count_time,
+                    'count_time_at' => Carbon::now()
+                ]);
         return response()->json(['result' => true]);
     }
     public function image_all_delete(Request $request){

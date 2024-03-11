@@ -95,8 +95,8 @@
                 @php 
                     $now = Carbon\Carbon::now();
                     $countTime = $row->count_time;
-                    $updatedAt = Carbon\Carbon::parse($row->updated_at);
-                    $diffTime = $now->diffInSeconds($updatedAt); 
+                    $counTimeAt = Carbon\Carbon::parse($row->count_time_at);
+                    $diffTime = $now->diffInSeconds($counTimeAt); 
                     $result = $countTime*3600 - $diffTime;
                 @endphp
                 @if($row->status == "Invoice Issued")

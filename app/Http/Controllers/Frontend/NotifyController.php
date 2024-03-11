@@ -16,8 +16,8 @@ class NotifyController extends Controller
     public function index(Request $request){
         $notify = Notify::Join('vehicle as v', 'notify.vehicle_id', '=', 'v.id')
                         ->leftJoin('users as u', 'notify.user_id', '=', 'u.id')
-                        ->select('notify.id', 'notify.vehicle_id', 'notify.user_id', 'u.name', 'u.email', 'v.count_time', 'v.updated_at')
-                        ->whereNotNull('v.updated_at')
+                        ->select('notify.id', 'notify.vehicle_id', 'notify.user_id', 'u.name', 'u.email', 'v.count_time', 'v.count_time_at')
+                        ->whereNotNull('v.count_time_at')
                         ->whereNotNull('v.count_time')
                         ->where('notify.notify_status', 0)
                         ->whereNull('v.deleted_at')
@@ -27,15 +27,17 @@ class NotifyController extends Controller
         //                 ->where("notify.notify_status", 0)
         //                 ->select('notify.id', 'notify.vehicle_id', 'notify.user_id', 'u.name', 'u.email')
         //                 ->get();
-        
         $subject = "Available to Sell";
         foreach ($notify as $row){
             $now = Carbon::now();
             $countTime = $row->count_time;
-            $updatedAt = Carbon::parse($row->updated_at);
-            $diffTime = $now->diffInSeconds($updatedAt); 
+            $counTimeAt = Carbon::parse($row->count_time_at);
+            $diffTime = $now->diffInSeconds($counTimeAt); 
             $available_time = $countTime*3600 - $diffTime;
             if ($available_time < 0) {
+                // update vehicle status from invoice issued to inquery
+                Vehicle::where('id', $row->vehicle_id)->update(['status' => Vehicle::INQUIRY]);
+                Notify::where('id', $row->id)->update(['notify_status' => 1]);
                 $email = $row->email;
                 $name = $row->name;
                 Mail::send('mail', array(
@@ -48,9 +50,6 @@ class NotifyController extends Controller
                     $message->to($email, $subject)
                             ->subject($subject);
                 });
-                // update vehicle status from invoice issued to inquery
-                Vehicle::where('id', $row->vehicle_id)->update(['status' => Vehicle::INQUIRY]);
-                Notify::where('id', $row->id)->update(['notify_status' => 1]);
             }
         }     
 

@@ -35,8 +35,8 @@ $last = end($explode);
                 
                 $now = Carbon\Carbon::now();
                 $countTime = $vehicle_data->count_time;
-                $updatedAt = Carbon\Carbon::parse($vehicle_data->updated_at);
-                $diffTime = $now->diffInSeconds($updatedAt); 
+                $CounTimeAt = Carbon\Carbon::parse($vehicle_data->count_time_at);
+                $diffTime = $now->diffInSeconds($CounTimeAt); 
                 $result = $countTime*3600 - $diffTime;
             @endphp
             @if($vehicle_data->status == "Invoice Issued")
@@ -526,8 +526,8 @@ $last = end($explode);
                 
                     $now = Carbon\Carbon::now();
                     $countTime = $vehicle_data->count_time;
-                    $updatedAt = Carbon\Carbon::parse($vehicle_data->updated_at);
-                    $diffTime = $now->diffInSeconds($updatedAt); 
+                    $counTimeAt = Carbon\Carbon::parse($vehicle_data->count_time_at);
+                    $diffTime = $now->diffInSeconds($counTimeAt); 
                     $result = $countTime*3600 - $diffTime;
                 @endphp
                 @if($vehicle_data->status == "Invoice Issued")

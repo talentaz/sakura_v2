@@ -11,6 +11,7 @@ use App\Models\VehicleImage;
 use App\Models\Vehicle;
 use App\Models\OrderStatus;
 use Mail, DB;
+use Carbon\Carbon;
 
 class ShippingController extends Controller
 {
@@ -103,7 +104,14 @@ class ShippingController extends Controller
                                 ->first()->max_status;        
         // $vehicle_status = Vehicle::where('id', $request->id)->first()->status;
         //                dd($vehicle_status);                                    
-        Vehicle::where('id', $request->id)->update(['status' => decodeStatus($max_status)]);
+        // Vehicle::where('id', $request->id)->update(['status' => decodeStatus($max_status)]);
+        Vehicle::where('id', $request->id)
+                ->update([
+                    'status' => $request->status,
+                    'count_time' => $request->count_time,
+                    'count_time_at' => Carbon::now()
+                ]);
+        // return response()->json(['result' => true]);
 
         //send status email to user
         $email = User::where('id', $request->user_id)->first()->email;
