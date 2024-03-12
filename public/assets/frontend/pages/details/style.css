@@ -207,7 +207,7 @@ body {
 }
 .under-offer a {
     color: #FFF;
-    background-color: #1697d8;
+    background-color: #900813;
     font-size: 12px;
     border: none;
     border-radius: 4px;
@@ -216,7 +216,7 @@ body {
     text-align: center;
 }
 .under-offer a:hover {
-    opacity: 0.85;
+    background-color: #4d070c;
 }
 .added-notify {
     text-align: center;
