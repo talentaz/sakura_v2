@@ -194,7 +194,7 @@
             var seconds = ("0" + remainingTime % 60).slice(-2);
             
             // Update the content of the element with the countdown timer
-            remainingTimeElement.innerHTML = 'Available in: ' + '<span class="time">'+ hours + '</span>' + '<span class="symbol"> h, </span>' + '<span class="time">'+ minutes + '</span>' + '<span class="symbol"> m, </span>' + '<span class="time">'+ seconds + '</span>' + '<span class="symbol"> s</span>';
+            remainingTimeElement.innerHTML = '<p class="available">Available in: </p>' + '<span class="time">'+ hours + '</span>' + '<span class="symbol"> h, </span>' + '<span class="time">'+ minutes + '</span>' + '<span class="symbol"> m, </span>' + '<span class="time">'+ seconds + '</span>' + '<span class="symbol"> s</span>';
             
             // Decrease remaining time by 1 second
             remainingTime--;
