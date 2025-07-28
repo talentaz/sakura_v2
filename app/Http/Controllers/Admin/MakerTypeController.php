@@ -40,9 +40,7 @@ class MakerTypeController extends Controller
             $file = $request->file;
             $fileName = $file->getClientOriginalName();
             $imgx = Image::make($file->getRealPath());
-            $imgx->resize(30, null, function ($constraint) {
-                $constraint->aspectRatio();
-            })->save($path.$fileName);
+            $imgx->save($path.$fileName);
             $data->image = $fileName; 
         };
         $data->save();
@@ -67,9 +65,7 @@ class MakerTypeController extends Controller
             $file = $request->file;
             $fileName = $file->getClientOriginalName();
             $imgx = Image::make($file->getRealPath());
-            $imgx->resize(30, null, function ($constraint) {
-                $constraint->aspectRatio();
-            })->save($path.$fileName);
+            $imgx->save($path.$fileName);
             $data->image = $fileName; 
         };
         $data->save();
@@ -81,3 +77,4 @@ class MakerTypeController extends Controller
         return response()->json(['result' => true]);
     }
 }
+

@@ -40,9 +40,7 @@ class BodyTypeController extends Controller
             $file = $request->file;
             $fileName = $file->getClientOriginalName();
             $imgx = Image::make($file->getRealPath());
-            $imgx->resize(50, null, function ($constraint) {
-                $constraint->aspectRatio();
-            })->save($path.$fileName);
+            $imgx->save($path.$fileName);
             $data->image = $fileName; 
         };
         $data->save();
@@ -68,9 +66,7 @@ class BodyTypeController extends Controller
             $file = $request->file;
             $fileName = $file->getClientOriginalName();
             $imgx = Image::make($file->getRealPath());
-            $imgx->resize(50, null, function ($constraint) {
-                $constraint->aspectRatio();
-            })->save($path.$fileName);
+            $imgx->save($path.$fileName);
             $data->image = $fileName; 
         };
         $data->save();
@@ -82,3 +78,4 @@ class BodyTypeController extends Controller
         return response()->json(['result' => true]);
     }
 }
+
