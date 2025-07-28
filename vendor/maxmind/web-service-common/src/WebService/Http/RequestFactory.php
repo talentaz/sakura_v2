@@ -16,7 +16,7 @@ class RequestFactory
      * done the connection is kept alive, SSL resumption can be used
      * etcetera.
      *
-     * @var resource
+     * @var \CurlHandle|null
      */
     private $ch;
 
@@ -27,6 +27,9 @@ class RequestFactory
         }
     }
 
+    /**
+     * @return \CurlHandle
+     */
     private function getCurlHandle()
     {
         if (empty($this->ch)) {
@@ -37,9 +40,9 @@ class RequestFactory
     }
 
     /**
-     * @return Request
+     * @param array<string, mixed> $options
      */
-    public function request(string $url, array $options)
+    public function request(string $url, array $options): Request
     {
         $options['curlHandle'] = $this->getCurlHandle();
 

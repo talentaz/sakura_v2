@@ -60,6 +60,7 @@ class BodyTypeController extends Controller
         $data = VehicleType::findOrFail($request->id);
         $data->vehicle_type = $request->vehicle_type;
         if ($request->has('file')) {
+            
             $path = public_path('uploads/body_type/');
             if(!file_exists($path)){
                 File::makeDirectory($path);

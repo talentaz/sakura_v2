@@ -32,3 +32,7 @@ function decodeStatus($status){
         return 'Document';
     }
 }
+function sanitize_price($price)
+{
+    return (float) str_replace([',', '$'], '', $price);
+}

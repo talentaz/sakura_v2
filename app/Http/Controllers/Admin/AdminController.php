@@ -13,7 +13,7 @@ class AdminController extends Controller
 {
     public function edit_profile(Request $request)
     {
-        $user = User::where('role', 1)->first();
+        $user = User::where('role_id', 1)->first();
         $country = config('config.country');
         return view('admin.pages.admin.editProfile', [
             'user' => $user,
@@ -22,7 +22,7 @@ class AdminController extends Controller
     }
 
     public function update_profile(Request $request){
-        $user_id = User::where('role', 1)->first()->id;
+        $user_id = User::where('role_id', 1)->first()->id;
         $user = User::findOrFail($user_id);
         $user->name = $request->name;
         $user->email = $request->email;

@@ -13,6 +13,12 @@
         <div class="col-12">
             <div class="card">
                 <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h4 class="card-title">User List</h4>
+                        <a href="{{ route('admin.user.create') }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Create User
+                        </a>
+                    </div>
                     <table id="datatable" class="table table-bordered dt-responsive  nowrap w-100 datatable">
                         <thead>
                             <tr>
@@ -20,6 +26,7 @@
                                 <th>Avatar</th>
                                 <th>User Name</th>
                                 <th>Email</th>
+                                <th>Role</th>
                                 <th>Country</th>
                                 <th>Action</th>
                             </tr>
@@ -37,14 +44,31 @@
                                 </td>
                                 <td>{{$row->name}}</td>
                                 <td>{{$row->email}}</td>
+                                <td>
+                                    @if($row->role)
+                                        <span class="badge bg-primary">{{$row->role->name}}</span>
+                                    @else
+                                        <span class="badge bg-secondary">No Role</span>
+                                    @endif
+                                </td>
                                 <td>{{$row->country}}</td>
                                 <td>
-                                    
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ route('admin.user.edit', $row->id) }}" class="btn btn-sm btn-primary" title="Edit User">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{{ route('admin.user.change_password', $row->id) }}" class="btn btn-sm btn-warning" title="Change Password">
+                                            <i class="fas fa-key"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-danger" onclick="deleteData({{$row->id}})" title="Delete User">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                             @empty
                             <tr>
-                                <td align="center" colspan="6">There are no any data.</p>
+                                <td align="center" colspan="7">There are no any data.</p>
                             </tr>
                             @endforelse
                         </tbody>

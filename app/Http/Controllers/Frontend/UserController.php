@@ -58,7 +58,7 @@ class UserController extends Controller
             $result->email = $request->email;
             $result->password = Hash::make($request->password);
             $result->country = $request->country;
-            $result->role = 2;
+            $result->role_id = 2; // Customer role
             // $result->real_password = $request->password;
             $result->save();
 

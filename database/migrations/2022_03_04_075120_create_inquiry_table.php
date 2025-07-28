@@ -18,8 +18,10 @@ class CreateInquiryTable extends Migration
             $table->integer('user_id')->nullable();
             $table->string('vehicle_name');
             $table->string('fob_price')->nullable();
-            $table->string('inspection')->nullable();
-            $table->string('insurance')->nullable();
+            $table->string('freight_fee')->nullable();
+            $table->string('insurance_fee')->nullable();
+            $table->string('inspection_fee')->nullable();
+            $table->string('discount')->nullable();
             $table->string('inqu_port')->nullable();
             $table->string('total_price')->nullable();
             $table->string('site_url');
@@ -32,6 +34,19 @@ class CreateInquiryTable extends Migration
             $table->string('stock_no')->nullable();
             $table->integer('vehicle_id')->nullable();
             $table->longText('inqu_comment')->nullable();
+
+            // New fields for enhanced inquiry system
+            $table->string('sales_agent')->nullable();
+            $table->string('customer_id')->nullable();
+            $table->string('vehicle_status')->default('Reserved');
+            $table->datetime('reserved_expiry_date')->nullable();
+            $table->string('final_country')->nullable();
+            $table->string('port_name')->nullable();
+            $table->string('type_of_purchase')->nullable();
+            $table->string('insurance')->nullable();
+            $table->string('inspection')->nullable();
+            $table->string('status')->default('Open');
+
             $table->timestamps();
         });
     }

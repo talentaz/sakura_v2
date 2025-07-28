@@ -115,8 +115,8 @@ class ContactController extends Controller
         return back()->with('success', 'Thanks for contacting!');
     }
     public function company(Request $request){
-        
-        return view('front.pages.company.index', [
+
+        return view('front.pages.about.company', [
 
         ]);
     }

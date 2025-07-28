@@ -24,29 +24,70 @@ use MaxMind\WebService\Http\RequestFactory;
  */
 class Client
 {
-    const VERSION = '0.2.0';
+    public const VERSION = '0.2.0';
 
+    /**
+     * @var string|null
+     */
     private $caBundle;
+
+    /**
+     * @var float|null
+     */
     private $connectTimeout;
+
+    /**
+     * @var string
+     */
     private $host = 'api.maxmind.com';
+
+    /**
+     * @var bool
+     */
+    private $useHttps = true;
+
+    /**
+     * @var RequestFactory
+     */
     private $httpRequestFactory;
+
+    /**
+     * @var string
+     */
     private $licenseKey;
+
+    /**
+     * @var string|null
+     */
     private $proxy;
+
+    /**
+     * @var float|null
+     */
     private $timeout;
+
+    /**
+     * @var string
+     */
     private $userAgentPrefix;
+
+    /**
+     * @var int
+     */
     private $accountId;
 
     /**
-     * @param int    $accountId  your MaxMind account ID
-     * @param string $licenseKey your MaxMind license key
-     * @param array  $options    an array of options. Possible keys:
-     *                           * `host` - The host to use when connecting to the web service.
-     *                           * `userAgent` - The prefix of the User-Agent to use in the request.
-     *                           * `caBundle` - The bundle of CA root certificates to use in the request.
-     *                           * `connectTimeout` - The connect timeout to use for the request.
-     *                           * `timeout` - The timeout to use for the request.
-     *                           * `proxy` - The HTTP proxy to use. May include a schema, port,
-     *                           username, and password, e.g., `http://username:password@127.0.0.1:10`.
+     * @param int                  $accountId  your MaxMind account ID
+     * @param string               $licenseKey your MaxMind license key
+     * @param array<string, mixed> $options    an array of options. Possible keys:
+     *                                         * `host` - The host to use when connecting to the web service.
+     *                                         * `useHttps` - Set to false to disable HTTPS.
+     *                                         * `userAgent` - The prefix of the User-Agent to use in the request.
+     *                                         * `caBundle` - The bundle of CA root certificates to use in the request.
+     *                                         * `connectTimeout` - The connect timeout to use for the request.
+     *                                         * `timeout` - The timeout to use for the request.
+     *                                         * `proxy` - The HTTP proxy to use. May include a schema, port,
+     *                                         username, and password, e.g., `http://username:password@127.0.0.1:10`.
      */
     public function __construct(
         int $accountId,
@@ -62,6 +103,9 @@ class Client
 
         if (isset($options['host'])) {
             $this->host = $options['host'];
+        }
+        if (isset($options['useHttps'])) {
+            $this->useHttps = $options['useHttps'];
         }
         if (isset($options['userAgent'])) {
             $this->userAgentPrefix = $options['userAgent'] . ' ';
@@ -83,9 +127,9 @@ class Client
     }
 
     /**
-     * @param string $service name of the service querying
-     * @param string $path    the URI path to use
-     * @param array  $input   the data to be posted as JSON
+     * @param string       $service name of the service querying
+     * @param string       $path    the URI path to use
+     * @param array<mixed> $input   the data to be posted as JSON
      *
      * @throws InvalidInputException      when the request has missing or invalid
      *                                    data
@@ -98,7 +142,7 @@ class Client
      * @throws WebServiceException        when some other error occurs. This also
      *                                    serves as the base class for the above exceptions.
      *
-     * @return array|null The decoded content of a successful response
+     * @return array<mixed>|null The decoded content of a successful response
      */
     public function post(string $service, string $path, array $input): ?array
     {
@@ -115,7 +159,7 @@ class Client
             ['Content-Type: application/json']
         );
 
-        list($statusCode, $contentType, $responseBody) = $request->post($requestBody);
+        [$statusCode, $contentType, $responseBody] = $request->post($requestBody);
 
         return $this->handleResponse(
             $statusCode,
@@ -126,11 +170,16 @@ class Client
         );
     }
 
+    /**
+     * @return array<mixed>|null
+     */
     public function get(string $service, string $path): ?array
     {
-        $request = $this->createRequest($path);
+        $request = $this->createRequest(
+            $path
+        );
 
-        list($statusCode, $contentType, $responseBody) = $request->get();
+        [$statusCode, $contentType, $responseBody] = $request->get();
 
         return $this->handleResponse(
             $statusCode,
@@ -145,11 +194,14 @@ class Client
     {
         $curlVersion = curl_version();
 
-        return $this->userAgentPrefix . 'MaxMind-WS-API/' . self::VERSION . ' PHP/' . PHP_VERSION .
+        return $this->userAgentPrefix . 'MaxMind-WS-API/' . self::VERSION . ' PHP/' . \PHP_VERSION .
            ' curl/' . $curlVersion['version'];
     }
 
-    private function createRequest(string $path, array $headers = []): \MaxMind\WebService\Http\Request
+    /**
+     * @param array<string> $headers
+     */
+    private function createRequest(string $path, array $headers = []): Http\Request
     {
         array_push(
             $headers,
@@ -187,7 +239,7 @@ class Client
      * @throws WebServiceException        when some other error occurs. This also
      *                                    serves as the base class for the above exceptions
      *
-     * @return array|null The decoded content of a successful response
+     * @return array<mixed>|null The decoded content of a successful response
      */
     private function handleResponse(
         int $statusCode,
@@ -213,17 +265,23 @@ class Client
     private function jsonErrorDescription(): string
     {
         $errno = json_last_error();
+
         switch ($errno) {
-            case JSON_ERROR_DEPTH:
+            case \JSON_ERROR_DEPTH:
                 return 'The maximum stack depth has been exceeded.';
-            case JSON_ERROR_STATE_MISMATCH:
+
+            case \JSON_ERROR_STATE_MISMATCH:
                 return 'Invalid or malformed JSON.';
-            case JSON_ERROR_CTRL_CHAR:
+
+            case \JSON_ERROR_CTRL_CHAR:
                 return 'Control character error.';
-            case JSON_ERROR_SYNTAX:
+
+            case \JSON_ERROR_SYNTAX:
                 return 'Syntax error.';
-            case JSON_ERROR_UTF8:
+
+            case \JSON_ERROR_UTF8:
                 return 'Malformed UTF-8 characters.';
+
             default:
                 return "Other JSON error ($errno).";
         }
@@ -236,7 +294,7 @@ class Client
      */
     private function urlFor(string $path): string
     {
-        return 'https://' . $this->host . $path;
+        return ($this->useHttps ? 'https://' : 'http://') . $this->host . $path;
     }
 
     /**
@@ -327,6 +385,7 @@ class Client
                     $statusCode,
                     $this->urlFor($path)
                 );
+
             case 'ACCOUNT_ID_REQUIRED':
             case 'ACCOUNT_ID_UNKNOWN':
             case 'AUTHORIZATION_INVALID':
@@ -339,6 +398,7 @@ class Client
                     $statusCode,
                     $this->urlFor($path)
                 );
+
             case 'OUT_OF_QUERIES':
             case 'INSUFFICIENT_FUNDS':
                 throw new InsufficientFundsException(
@@ -347,6 +407,7 @@ class Client
                     $statusCode,
                     $this->urlFor($path)
                 );
+
             case 'PERMISSION_REQUIRED':
                 throw new PermissionRequiredException(
                     $message,
@@ -354,6 +415,7 @@ class Client
                     $statusCode,
                     $this->urlFor($path)
                 );
+
             default:
                 throw new InvalidRequestException(
                     $message,
@@ -407,7 +469,7 @@ class Client
      *                             included, or is expected and included
      *                             but cannot be decoded as JSON
      *
-     * @return array|null the decoded request body
+     * @return array<mixed>|null the decoded request body
      */
     private function handleSuccess(int $statusCode, ?string $body, string $service): ?array
     {
@@ -443,7 +505,7 @@ class Client
         return $decodedContent;
     }
 
-    private function getCaBundle()
+    private function getCaBundle(): ?string
     {
         $curlVersion = curl_version();
 

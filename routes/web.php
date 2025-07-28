@@ -40,6 +40,40 @@ Route::get('/blog', [App\Http\Controllers\Frontend\BlogController::class, 'index
 Route::get('/blog/{id}', [App\Http\Controllers\Frontend\BlogController::class, 'details'])->name('front.blog.detail');
 Route::get('/customer_vocie', [App\Http\Controllers\Frontend\CustomerController::class, 'index'])->name('front.customer_vocie');
 
+// Customer Authentication Routes
+Route::group(['prefix' => 'customer'], function(){
+    Route::get('/login', [App\Http\Controllers\Frontend\CustomerAuthController::class, 'showLoginForm'])->name('front.customer.login');
+    Route::post('/login', [App\Http\Controllers\Frontend\CustomerAuthController::class, 'login'])->name('front.customer.login.post');
+    Route::get('/signup', [App\Http\Controllers\Frontend\CustomerAuthController::class, 'showRegistrationForm'])->name('front.customer.signup');
+    Route::post('/signup', [App\Http\Controllers\Frontend\CustomerAuthController::class, 'register'])->name('front.customer.signup.post');
+    Route::get('/forgot-password', [App\Http\Controllers\Frontend\CustomerAuthController::class, 'showForgotPasswordForm'])->name('front.customer.forgot-password');
+    Route::post('/forgot-password', [App\Http\Controllers\Frontend\CustomerAuthController::class, 'sendResetLinkEmail'])->name('front.customer.forgot-password.post');
+    Route::get('/reset-password/{token}', [App\Http\Controllers\Frontend\CustomerAuthController::class, 'showResetPasswordForm'])->name('front.customer.reset-password');
+    Route::post('/reset-password', [App\Http\Controllers\Frontend\CustomerAuthController::class, 'resetPassword'])->name('front.customer.reset-password.post');
+});
+
+// Customer Protected Routes
+Route::prefix('/customer')->middleware(['auth:customer'])->group(function () {
+    Route::get('/dashboard', [App\Http\Controllers\Frontend\CustomerAuthController::class, 'dashboard'])->name('front.customer.dashboard');
+    Route::post('/logout', [App\Http\Controllers\Frontend\CustomerAuthController::class, 'logout'])->name('front.customer.logout');
+
+    // New Dashboard Pages
+    Route::get('/inquiries', [App\Http\Controllers\Frontend\CustomerDashboardController::class, 'inquiries'])->name('front.customer.inquiries');
+    Route::get('/purchases', [App\Http\Controllers\Frontend\CustomerDashboardController::class, 'purchases'])->name('front.customer.purchases');
+    Route::get('/profile', [App\Http\Controllers\Frontend\CustomerDashboardController::class, 'profile'])->name('front.customer.profile');
+    Route::post('/profile', [App\Http\Controllers\Frontend\CustomerDashboardController::class, 'updateProfile'])->name('front.customer.profile.update');
+    Route::get('/billing/{inquiry}', [App\Http\Controllers\Frontend\CustomerDashboardController::class, 'billingHistory'])->name('front.customer.billing');
+
+    // Legacy routes (keeping for backward compatibility)
+    Route::get('/mypage', [App\Http\Controllers\Frontend\UserController::class, 'myPage'])->name('front.customer.mypage');
+    Route::post('/mypage_post', [App\Http\Controllers\Frontend\UserController::class, 'mypage_post'])->name('front.customer.mypage_post');
+    Route::get('/chatroom', [App\Http\Controllers\Frontend\UserController::class, 'chatRoom'])->name('front.customer.chatroom');
+    Route::get('/chatroom/{id}', [App\Http\Controllers\Frontend\UserController::class, 'chatDetail'])->name('front.customer.chatdetail');
+    Route::get('/changepassword', [App\Http\Controllers\Frontend\UserController::class, 'changePassword'])->name('front.customer.changepassword');
+    Route::post('/comments/create', [App\Http\Controllers\Frontend\UserController::class, 'comments'])->name('front.customer.comment_create');
+});
+
+// Legacy User Routes (keeping for backward compatibility)
 Route::group(['prefix' => 'user'], function(){
     Route::get('/login', [App\Http\Controllers\Frontend\UserController::class, 'login'])->name('front.user.login');
     Route::post('/login_post', [App\Http\Controllers\Frontend\UserController::class, 'login_post'])->name('front.user.login_post');
@@ -57,7 +91,7 @@ Route::prefix('/user')->middleware(['auth:web', 'CustomerRole'])->group(function
 Route::get('/clear', [App\Http\Controllers\Frontend\FrontController::class, 'clear'])->name('front.clear');
 
 // admin dashboard
-Route::prefix('/admin')->middleware(['auth:web', 'Admin'])->group(function () {
+Route::prefix('/admin')->middleware(['auth:web', 'role:admin'])->group(function () {
     Route::get('/', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('root');
     Route::group(['prefix' => 'notification'], function(){
         Route::get('/', [App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('admin.notification');
@@ -65,6 +99,10 @@ Route::prefix('/admin')->middleware(['auth:web', 'Admin'])->group(function () {
     });
     Route::group(['prefix' => 'user'], function(){
         Route::get('/', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('admin.user');
+        Route::get('/create', [App\Http\Controllers\Admin\UserController::class, 'create'])->name('admin.user.create');
+        Route::post('/create', [App\Http\Controllers\Admin\UserController::class, 'store'])->name('admin.user.store');
+        Route::get('/{id}/edit', [App\Http\Controllers\Admin\UserController::class, 'edit'])->name('admin.user.edit');
+        Route::post('/{id}/edit', [App\Http\Controllers\Admin\UserController::class, 'update'])->name('admin.user.update');
         Route::get('/{id}/change_passowrd', [App\Http\Controllers\Admin\UserController::class, 'change_password'])->name('admin.user.change_password');
         Route::post('/updatePassword', [App\Http\Controllers\Admin\UserController::class, 'updatePassword'])->name('admin.user.updatePassword');
         Route::post('/delete', [App\Http\Controllers\Admin\UserController::class, 'delete'])->name('admin.user.delete');
@@ -101,6 +139,20 @@ Route::prefix('/admin')->middleware(['auth:web', 'Admin'])->group(function () {
         Route::post('/imageAdd', [App\Http\Controllers\Admin\CustomerController::class, 'imageAdd'])->name('admin.customer.imageAdd');
         Route::post('/imageDelete', [App\Http\Controllers\Admin\CustomerController::class, 'imageDelete'])->name('admin.customer.imageDelete');
     });
+
+    // Customer Management Routes (for actual customer accounts)
+    Route::group(['prefix' => 'customer-management'], function(){
+        Route::get('/', [App\Http\Controllers\Admin\CustomerManagementController::class, 'index'])->name('admin.customer_management.index');
+        Route::get('/create', [App\Http\Controllers\Admin\CustomerManagementController::class, 'create'])->name('admin.customer_management.create');
+        Route::post('/store', [App\Http\Controllers\Admin\CustomerManagementController::class, 'store'])->name('admin.customer_management.store');
+        Route::get('/{id}', [App\Http\Controllers\Admin\CustomerManagementController::class, 'show'])->name('admin.customer_management.show');
+        Route::get('/{id}/edit', [App\Http\Controllers\Admin\CustomerManagementController::class, 'edit'])->name('admin.customer_management.edit');
+        Route::put('/{id}', [App\Http\Controllers\Admin\CustomerManagementController::class, 'update'])->name('admin.customer_management.update');
+        Route::delete('/{id}', [App\Http\Controllers\Admin\CustomerManagementController::class, 'destroy'])->name('admin.customer_management.destroy');
+        Route::post('/{id}/restore', [App\Http\Controllers\Admin\CustomerManagementController::class, 'restore'])->name('admin.customer_management.restore');
+        Route::delete('/{id}/force', [App\Http\Controllers\Admin\CustomerManagementController::class, 'forceDelete'])->name('admin.customer_management.force_delete');
+        Route::post('/change-status', [App\Http\Controllers\Admin\CustomerManagementController::class, 'changeStatus'])->name('admin.customer_management.change_status');
+    });
     Route::group(['prefix' => 'port'], function(){
         Route::get('/', [App\Http\Controllers\Admin\PortController::class, 'index'])->name('admin.port.index');
         Route::get('/edit/{id}', [App\Http\Controllers\Admin\PortController::class, 'edit'])->name('admin.port.edit');
@@ -129,8 +181,17 @@ Route::prefix('/admin')->middleware(['auth:web', 'Admin'])->group(function () {
     });
     Route::group(['prefix' => 'inquiry'], function(){
         Route::get('/', [App\Http\Controllers\Admin\InquiryController::class, 'index'])->name('admin.inquiry.index');
+        Route::get('/create', [App\Http\Controllers\Admin\InquiryController::class, 'create'])->name('admin.inquiry.create');
+        Route::post('/store', [App\Http\Controllers\Admin\InquiryController::class, 'store'])->name('admin.inquiry.store');
+        Route::get('/{id}', [App\Http\Controllers\Admin\InquiryController::class, 'show'])->name('admin.inquiry.show');
+        Route::get('/{id}/edit', [App\Http\Controllers\Admin\InquiryController::class, 'edit'])->name('admin.inquiry.edit');
+        Route::put('/{id}', [App\Http\Controllers\Admin\InquiryController::class, 'update'])->name('admin.inquiry.update');
+        Route::delete('/{id}', [App\Http\Controllers\Admin\InquiryController::class, 'destroy'])->name('admin.inquiry.destroy');
         Route::post('/detail', [App\Http\Controllers\Admin\InquiryController::class, 'detail'])->name('admin.inquiry.detail');
         Route::get('/delete', [App\Http\Controllers\Admin\InquiryController::class, 'delete'])->name('admin.inquiry.delete');
+        Route::post('/update-status', [App\Http\Controllers\Admin\InquiryController::class, 'updateStatus'])->name('admin.inquiry.updateStatus');
+        Route::get('/{id}/generate-pdf', [App\Http\Controllers\Admin\InquiryController::class, 'generatePDF'])->name('admin.inquiry.generatePDF');
+        Route::get('/{id}/generate-invoice', [App\Http\Controllers\Admin\InquiryController::class, 'generateInvoice'])->name('admin.inquiry.generateInvoice');
     });
     Route::group(['prefix' => 'shipping'], function(){
         Route::get('/', [App\Http\Controllers\Admin\ShippingController::class, 'index'])->name('admin.shipping.index');
@@ -157,6 +218,14 @@ Route::prefix('/admin')->middleware(['auth:web', 'Admin'])->group(function () {
             Route::post('/edit_post', [App\Http\Controllers\Admin\MakerTypeController::class, 'edit_post'])->name('admin.makerType.edit_post');
             Route::get('/delete', [App\Http\Controllers\Admin\MakerTypeController::class, 'delete'])->name('admin.makerType.delete');
         });
+    });
+    Route::group(['prefix' => 'page_setting'], function(){
+        Route::get('/', [App\Http\Controllers\Admin\PageSettingController::class, 'index'])->name('admin.page_setting.index');
+        Route::get('/create', [App\Http\Controllers\Admin\PageSettingController::class, 'create'])->name('admin.page_setting.create');
+        Route::post('/create', [App\Http\Controllers\Admin\PageSettingController::class, 'store'])->name('admin.page_setting.store');
+        Route::get('/{id}/edit', [App\Http\Controllers\Admin\PageSettingController::class, 'edit'])->name('admin.page_setting.edit');
+        Route::post('/{id}/edit', [App\Http\Controllers\Admin\PageSettingController::class, 'update'])->name('admin.page_setting.update');
+        Route::delete('/{id}', [App\Http\Controllers\Admin\PageSettingController::class, 'destroy'])->name('admin.page_setting.destroy');
     });
     Route::get('/edit_profile', [App\Http\Controllers\Admin\AdminController::class, 'edit_profile'])->name('admin.edit_profile');
     Route::post('/update_profile', [App\Http\Controllers\Admin\AdminController::class, 'update_profile'])->name('admin.update_profile');

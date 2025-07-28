@@ -4,20 +4,13 @@ namespace Stevebauman\Location\Drivers;
 
 use Exception;
 use GeoIp2\Database\Reader;
+use GeoIp2\Model\City;
 use GeoIp2\WebService\Client;
 use Illuminate\Support\Fluent;
 use Stevebauman\Location\Position;
 
 class MaxMind extends Driver
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function url($ip)
-    {
-        return;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -46,17 +39,24 @@ class MaxMind extends Driver
         try {
             $record = $this->fetchLocation($ip);
 
+            if ($record instanceof City) {
+                return new Fluent([
+                    'country' => $record->country->name,
+                    'country_code' => $record->country->isoCode,
+                    'city' => $record->city->name,
+                    'regionCode' => $record->mostSpecificSubdivision->isoCode,
+                    'regionName' => $record->mostSpecificSubdivision->name,
+                    'postal' => $record->postal->code,
+                    'timezone' => $record->location->timeZone,
+                    'latitude' => (string) $record->location->latitude,
+                    'longitude' => (string) $record->location->longitude,
+                    'metro_code' => (string) $record->location->metroCode,
+                ]);
+            }
+
             return new Fluent([
                 'country' => $record->country->name,
                 'country_code' => $record->country->isoCode,
-                'city' => $record->city->name,
-                'regionCode' => $record->mostSpecificSubdivision->isoCode,
-                'regionName' => $record->mostSpecificSubdivision->name,
-                'postal' => $record->postal->code,
-                'timezone' => $record->location->timeZone,
-                'latitude' => (string) $record->location->latitude,
-                'longitude' => (string) $record->location->longitude,
-                'metro_code' => (string) $record->location->metroCode,
             ]);
         } catch (Exception $e) {
             return false;
@@ -78,7 +78,11 @@ class MaxMind extends Driver
             ? $this->newClient($this->getUserId(), $this->getLicenseKey(), $this->getOptions())
             : $this->newReader($this->getDatabasePath());
 
-        return $maxmind->city($ip);
+        if ($this->isWebServiceEnabled() || $this->getLocationType() === 'city') {
+            return $maxmind->city($ip);
+        }
+
+        return $maxmind->country($ip);
     }
 
     /**
@@ -156,5 +160,15 @@ class MaxMind extends Driver
     protected function getDatabasePath()
     {
         return config('location.maxmind.local.path', database_path('maxmind/GeoLite2-City.mmdb'));
+    }
+
+    /**
+     * Returns the MaxMind location type.
+     *
+     * @return string
+     */
+    protected function getLocationType()
+    {
+        return config('location.maxmind.local.type', 'city');
     }
 }

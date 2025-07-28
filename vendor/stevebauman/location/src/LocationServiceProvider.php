@@ -2,8 +2,8 @@
 
 namespace Stevebauman\Location;
 
-use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 
 class LocationServiceProvider extends ServiceProvider
 {
@@ -18,7 +18,7 @@ class LocationServiceProvider extends ServiceProvider
             return;
         }
 
-        $config = __DIR__.'/../config/config.php';
+        $config = __DIR__.'/../config/location.php';
 
         if ($this->app->runningInConsole()) {
             $this->publishes([$config => config_path('location.php')]);

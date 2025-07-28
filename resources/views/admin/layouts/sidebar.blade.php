@@ -80,11 +80,31 @@
                 </li>
                 <li>
                     <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <i class="bx bx-file"></i>
+                        <span>Page Management</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="true">
+                        <li><a href="{{route('admin.page_setting.index')}}">Page Settings</a></li>
+                        <li><a href="{{route('admin.page_setting.create')}}">Add Page</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="javascript: void(0);" class="has-arrow waves-effect">
                         <i class="bx bx-user"></i>
                         <span>User Management</span>
                     </a>
                     <ul class="sub-menu" aria-expanded="true">
                         <li><a href="{{route('admin.user')}}">Registered User</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="javascript: void(0);" class="has-arrow waves-effect">
+                        <i class="bx bx-group"></i>
+                        <span>Customer Management</span>
+                    </a>
+                    <ul class="sub-menu" aria-expanded="true">
+                        <li><a href="{{route('admin.customer_management.index')}}">Customer List</a></li>
+                        <li><a href="{{route('admin.customer_management.create')}}">Add Customer</a></li>
                     </ul>
                 </li>
                 <li>

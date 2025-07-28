@@ -1,10 +1,12 @@
+<h1 align="center">Location</h1>
+
 <p align="center">
-    <img src="https://github.com/stevebauman/location/blob/master/art/logo.png">
+Retrieve a user's location from their IP address using various services.
 </p>
 
 <p align="center">
 <a href="https://github.com/stevebauman/location/actions">
-<img src="https://img.shields.io/github/workflow/status/stevebauman/location/run-tests.svg?style=flat-square">
+<img src="https://img.shields.io/github/actions/workflow/status/stevebauman/location/run-tests.yml?branch=master&style=flat-square">
 </a>
 
 <a href="https://scrutinizer-ci.com/g/stevebauman/location/?branch=master">
@@ -22,9 +24,9 @@
 
 ## Requirements
 
-- PHP >= 7.0
+- PHP >= 7.3
+- PHP cURL extension enabled
 - Laravel >= 5.0
-- cURL extension enabled
 
 ## Installation
 
@@ -53,8 +55,6 @@ php artisan vendor:publish --provider="Stevebauman\Location\LocationServiceProvi
 
 ### Retrieve a client's location
 
-> **Note**: This method retrieves the user's IP address via `request()->ip()`:
-
 ```php
 use Stevebauman\Location\Facades\Location;
 
@@ -66,6 +66,10 @@ if ($position = Location::get()) {
 }
 ```
 
+> **Note**:
+> - This method retrieves the user's IP address via `request()->ip()`.
+> - In the default configuration, `testing.enabled` is active, the returned IP address is in the USA. Disable it to get the client's real IP address.
+
 ### Retrieve the location of a specific IP address
 
 ```php
@@ -76,14 +80,16 @@ $position = Location::get('192.168.1.1');
 
 ### Available Drivers
 
-Available drivers at the moment are:
+Available drivers:
 
 - [IpApi](http://ip-api.com) - Default
 - [IpApiPro](https://pro.ip-api.com)
 - [IpData](https://ipdata.co)
 - [IpInfo](https://ipinfo.io)
+- [Kloudend](https://ipapi.co)
 - [GeoPlugin](http://www.geoplugin.com)
 - [MaxMind](https://www.maxmind.com/en/home)
+- [Cloudflare](https://support.cloudflare.com/hc/en-us/articles/200168236-Configuring-IP-geolocation)
 
 #### Setting up MaxMind with a self-hosted database (optional)
 
@@ -95,12 +101,14 @@ To set up MaxMind to retrieve the user's location from your own server, you must
 1. Create a [maxmind account](https://www.maxmind.com/en/geolite2/signup).
 2. Sign in.
 3. Click "Download Files" from the left-hand navigation menu.
-4. Download the `GeoLite2-City.tar.gz` GZIP file.
+4. Download the `GeoLite2-City.tar.gz` or `GeoLite2-Country.tar.gz` GZIP file depending on how precisely you need to locate people.
 3. Extract the downloaded file (you may need to use an application such as [7zip](http://www.7-zip.org/download.html) if on Windows).
 4. Create a `maxmind` folder inside your Laravel application's `database` directory (`database/maxmind`).
-5. Place the `GeoLite2-City.mmdb` file into the `maxmind` directory. You should end up with a folder path of:
-    - `my-laravel-app/database/maxmind/GeoLite2-City.mmdb`.
-6. Set your default location `driver` to `Stevebauman\Location\Drivers\MaxMind::class`, and you're all set!
+5. Place the `GeoLite2-City.mmdb` or `GeoLite2-Country.mmdb` file into the `maxmind` directory. You should end up with a folder path of:
+    - `my-laravel-app/database/maxmind/GeoLite2-*.mmdb`.
+6. Inside `config/location.php`, set your default location `driver` to `Stevebauman\Location\Drivers\MaxMind::class`.
+7. If you opted for the country database, edit `maxmind.local.type` to `country` and update `maxmind.local.path`.
+8. That's it, you're all set!
 
 > **Note**: Keep in mind, you'll need to update this file on a regular basis to retrieve the most current information from clients.
 

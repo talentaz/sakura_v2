@@ -10,6 +10,7 @@ use App\Models\Vehicle;
 use App\Models\VehicleImage;
 use App\Models\Rate;
 use App\Models\UserReview;
+use App\Models\News;
 use App\Models\UserReviewImage;
 use Location;
 
@@ -36,7 +37,8 @@ class FrontController extends Controller
                                     AND a.deleted_at IS NULL
                                     AND a.status IN (NULL, "", "Inquiry", "Invoice Issued")
                                     ORDER BY a.id DESC
-                                    LIMIT 8');
+                                    LIMIT 5');
+                                    
         $best_vehicle_data = DB::select('SELECT a.*,
                                             b.image_length,
                                             b.*
@@ -53,7 +55,8 @@ class FrontController extends Controller
                                         AND a.sale_price IS NOT NULL
                                         AND a.status IN (NULL, "", "Inquiry", "Invoice Issued")
                                         ORDER BY a.id DESC
-                                        LIMIT 8');
+                                        LIMIT 10');
+                                        // dd($best_vehicle_data);
         $vehicle_type = DB::table('vehicle_types as a')
                     ->leftJoin(DB::raw('(SELECT body_type, COUNT(*) cnt FROM vehicle WHERE deleted_at IS NULL GROUP BY body_type) as b'), 'a.vehicle_type', '=', 'b.body_type')
                     ->select('a.*', DB::raw('IFNULL(b.cnt, 0) AS cnt'))
@@ -76,6 +79,35 @@ class FrontController extends Controller
                             ->leftJoin(DB::raw('(SELECT make_type, COUNT(*) as cnt FROM vehicle WHERE deleted_at IS NULL GROUP BY make_type) b'), 'a.maker_type', '=', 'b.make_type')
                             ->orderBy('a.order_id')
                             ->get();
+        $vehicle_type = DB::table('vehicle_types as a')
+                            ->select('a.*', DB::raw('IFNULL(b.cnt, 0) as cnt'))
+                            ->leftJoin(
+                                DB::raw('(
+                                    SELECT body_type, COUNT(*) as cnt 
+                                    FROM vehicle 
+                                    WHERE deleted_at IS NULL 
+                                    GROUP BY body_type
+                                ) b'),
+                                'a.vehicle_type',
+                                '=',
+                                'b.body_type'
+                            )
+                            ->orderBy('a.order_id')
+                            ->get();
+
+        //Customer voice
+        $customer = UserReview::leftJoin('user_review_image', 'user_review.id', '=', 'user_review_image.user_review_id')
+                              ->groupBy('user_review.id')
+                              ->orderBy('user_review.id', 'desc')
+                              ->select('user_review.*', 'user_review_image.image')
+                              ->limit(3)  
+                              ->get();    
+        $news = News::leftJoin('news_image', 'news_image.news_id', '=', 'news.id')
+                    ->groupBy('news.id')
+                    ->orderBy('news.id', 'desc')
+                    ->select('news.*', 'news_image.image')
+                    ->limit(3)  
+                    ->get(); 
         //config variable
         $models = config('config.model_catgory');
         $body_type= config('config.body_type');
@@ -92,11 +124,8 @@ class FrontController extends Controller
         for ($i=1000; $i <= 14000; $i+= 2000) { 
             array_push($price, $i);
         }
-        //Customer voice
-        $customer = UserReview::leftJoin('user_review_image', 'user_review.id', '=', 'user_review_image.user_review_id')
-                              ->groupBy('user_review.id')
-                              ->orderBy('user_review.created_at', 'desc')
-                              ->paginate(6);                              
+                       
+        // dd($customer);
         return view('front.pages.home.index', [
             'vehicle_data' => $vehicle_data,
             'best_vehicle_data' => $best_vehicle_data,
@@ -119,6 +148,8 @@ class FrontController extends Controller
 
              //customer voice
              'customer' => $customer,
+             'news' => $news,
+             
         ]);
     }
     public function clear(Request $request)

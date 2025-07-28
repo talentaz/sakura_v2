@@ -11,6 +11,8 @@ class HttpException extends WebServiceException
 {
     /**
      * The URI queried.
+     *
+     * @var string
      */
     private $uri;
 
@@ -24,7 +26,7 @@ class HttpException extends WebServiceException
         string $message,
         int $httpStatus,
         string $uri,
-        \Exception $previous = null
+        ?\Exception $previous = null
     ) {
         $this->uri = $uri;
         parent::__construct($message, $httpStatus, $previous);

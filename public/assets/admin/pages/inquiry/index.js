@@ -1,60 +1,61 @@
-$(document).ready(function(){
-    $('.edit').click(function(e){
-        e.preventDefault();
-        e.stopPropagation();
-        var id = $(this).data('id');
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-        $.ajax({
-            url: detail_url,
-            method: 'post',
-            data: {id:id},
-            success: function (data){
-                var result = data.data;
-                console.log(result)
-                $('.inqu-name').text(result.inqu_name)
-                $('.inqu-email').text(result.inqu_email)
-                $('.inqu-phone').text(result.inqu_mobile)
-                $('.inqu-country').text(result.inqu_country)
-                $('.inqu-city').text(result.inqu_city)
-                $('.inqu-address').text(result.inqu_address)
-                $('.inqu-vehicle a').text(result.vehicle_name)
-                $('.inqu-vehicle a').attr("href", result.site_url)
-                $('.inqu-fprice').text(result.fob_price)
-                $('.inqu-insurance').text(result.insurance)
-                $('.inqu-inspection').text(result.inspection)
-                $('.inqu-port').text(result.inqu_port)
-                $('.inqu-tprice').text(result.total_price)
-                $('.inqu-stock a').text(result.stock_no)
-                $('.inqu-stock a').attr("href", result.site_url)
-                $('.inqu-comment').html(result.inqu_comment)
+$(document).ready(function () {
+    let currentDeleteId = null;
 
-            }
-        })
-    })
-    $('#datatable').on('click', '.confirm_delete', function(e){
+    // Initialize DataTable - Destroy if exists
+    if ($.fn.DataTable.isDataTable("#datatable")) {
+        $("#datatable").DataTable().destroy();
+    }
+
+    $("#datatable").DataTable({
+        pageLength: 10,
+        lengthMenu: [
+            [10, 25, 50, 100],
+            [10, 25, 50, 100],
+        ],
+        order: [[0, "desc"]],
+        columnDefs: [{ orderable: false, targets: [1] }],
+    });
+
+    // Handle entries select change
+    $("#entries-select").on("change", function () {
+        var table = $("#datatable").DataTable();
+        table.page.len(parseInt($(this).val())).draw();
+    });
+
+    // Delete inquiry
+    $(document).on("click", ".delete-inquiry", function (e) {
         e.preventDefault();
         e.stopPropagation();
-        var id = $(this).data('id');
-        $('.delete_button').click(function(){
+        currentDeleteId = $(this).data("id");
+    });
+
+    $("#confirm-delete").on("click", function () {
+        if (currentDeleteId) {
             $.ajaxSetup({
                 headers: {
-                  'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
+                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr(
+                        "content"
+                    ),
+                },
             });
+
             $.ajax({
                 url: delete_url,
-                method: 'get',
-                data: {id:id},
-                success: function (data){
-                    toastr["success"]("Success");
-                    $('#myModal').modal('hide');
-                    location.href = list_url; 
-                }
-            })
-        })
-    })
-})
+                method: "GET",
+                data: { id: currentDeleteId },
+                success: function (response) {
+                    if (response.result) {
+                        toastr.success("Inquiry deleted successfully");
+                        $("#deleteModal").modal("hide");
+                        location.reload();
+                    } else {
+                        toastr.error("Failed to delete inquiry");
+                    }
+                },
+                error: function () {
+                    toastr.error("Error deleting inquiry");
+                },
+            });
+        }
+    });
+});

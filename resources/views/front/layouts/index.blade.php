@@ -7,6 +7,7 @@
     <title> @yield('title') | SakuraMotors</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @include('front.layouts.header')
+    @yield('css')
 </head>
 <body>
     <div class="spinner-wrapper">
@@ -14,32 +15,14 @@
             <span class="sr-only">Loading...</span>
         </div>
     </div>
-    <div class="whatsapp">
-        <div class="wrap">
-            <img src="{{URL::asset ('/assets/frontend/images/whatsapp.png')}}" alt="">
-        </div>
-    </div>
-    <div id="sideWhatsappAdd" class="side_whatsapp_add">
-        <ul>
-            <li>
-                <a href="https://wa.me/819093450908">
-                    <span>Nalaka :</span>
-                    <span>+81-90-9345-0908</span>
-                </a>
-            </li>
-            <li>
-                <a href="https://wa.me/818068823553">
-                    <span>Rajika :</span>
-                    <span>+81-80-6882-3553</span>
-                </a>
-            </li>
-        </ul>
-    </div>
-    @include('front.layouts.topMenu')
+    @if(!isset($hideMenu) || !$hideMenu)
+        @include('front.layouts.menu')
+    @endif
     @yield('content')
-    @include('front.layouts.footer')
-    <script src='https://ajax.aspnetcdn.com/ajax/jquery.ui/1.8.10/jquery-ui.min.js'></script>
-    <script>
+    @if(!isset($hideFooter) || !$hideFooter)
+        @include('front.layouts.footer')
+    @endif
+     <script>
         $(document).ready(function(){
             //ajax loading spinner
             var loading = $('.spinner-wrapper').hide();
@@ -52,11 +35,8 @@
                         loading.hide();
                     }, 500)
                 });
-            $('.whatsapp').on('click', function(){
-                $('#sideWhatsappAdd').animate({width:'toggle'},350);
-            })
-            console.log("Screen Width: " + screen.width);
         })
     </script>
+    @yield('script')
 </body>
 </html>

@@ -18,13 +18,13 @@ class DashboardController extends Controller
         $this_month = date('m');
         $last_month = date('m', strtotime("last day of -1 month"));
         $year = date('Y');
-        $user = User::where('role', 2)->where('status', 1)->select(DB::raw('count(*) as count'))->first();
+        $user = User::where('role_id', 2)->where('status', 1)->select(DB::raw('count(*) as count'))->first();
         $vehicle = vehicle::select(DB::raw('count(*) as count'))->first();
         $news = News::select(DB::raw('count(*) as count'))->first();
         $customer = UserReview::select(DB::raw('count(*) as count'))->first();
         
         $this_month_user = User::select(DB::raw('MONTH(created_at) as month'), DB::raw('YEAR(created_at) as year'), DB::raw('count(*) as total'))
-                            ->where('role', 2)
+                            ->where('role_id', 2)
                             ->where('status', 1)
                             ->whereRaw('MONTH(created_at) = ?', [$this_month])
                             ->whereRaw('YEAR(created_at) = ?', [$year])
@@ -32,7 +32,7 @@ class DashboardController extends Controller
                             ->first();
         // dd($this_month_user);
         $last_month_user = User::select(DB::raw('MONTH(created_at) as month'), DB::raw('YEAR(created_at) as year'), DB::raw('count(*) as total'))
-                            ->where('role', 2)
+                            ->where('role_id', 2)
                             ->where('status', 1)
                             ->whereRaw('MONTH(created_at) = ?', [$last_month])
                             ->whereRaw('YEAR(created_at) = ?', [$year])
@@ -40,7 +40,7 @@ class DashboardController extends Controller
                             ->first();
         
         $user_data = User::select(DB::raw('MONTH(created_at) as month'), DB::raw('YEAR(created_at) as year'), DB::raw('count(*) as total'))
-                            ->where('role', 2)
+                            ->where('role_id', 2)
                             ->where('status', 1)
                             ->whereRaw('YEAR(created_at) = ?', [$year])
                             ->groupBy('month')
@@ -49,7 +49,7 @@ class DashboardController extends Controller
         if ($request->ajax()) {
             $year = $request->year;
             $user_data = User::select(DB::raw('MONTH(created_at) as month'), DB::raw('YEAR(created_at) as year'), DB::raw('count(*) as total'))
-                            ->where('role', 2)
+                            ->where('role_id', 2)
                             ->where('status', 1)
                             ->whereRaw('YEAR(created_at) = ?', [$year])
                             ->groupBy('month')

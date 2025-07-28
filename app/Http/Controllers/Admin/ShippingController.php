@@ -16,7 +16,7 @@ use Carbon\Carbon;
 class ShippingController extends Controller
 {
     public function index(Request $request){ 
-        $user = User::where('role', 2)->orderBy('updated_at', 'desc')->get();;
+        $user = User::where('role_id', 2)->orderBy('updated_at', 'desc')->get();;
         return view('admin.pages.shipping.index', [
             'user' => $user,
         ]);

@@ -21,7 +21,7 @@ class StockController extends Controller
         // $ip = file_get_contents('https://api.ipify.org');
         $ip = $request->getClientIp();
         if($ip == '127.0.0.1'){
-            $ip = '188.43.235.177'; //Russia IP address
+            $ip = '62.33.81.28'; //Russia IP address
         }
         $country_ip = \Location::get($ip);
         $current_country = Port::where('country', 'LIKE', "%{$country_ip->countryName}%")->first();
@@ -128,8 +128,10 @@ class StockController extends Controller
         for ($i=1000; $i <= 14000; $i+= 2000) { 
             array_push($price, $i);
         }
+        
         $rate = Rate::first()->rate;    
         $vehicle_data = Vehicle::select('vehicle.*', 'vehicle_image.image',  
+                                DB::raw('COUNT(*) OVER() AS vehicle_count'),
                                 DB::raw('ROUND(price /"'.$rate.'") AS price_usd'), 'image_length')
                                 ->join(DB::raw('(SELECT vehicle_id, COUNT(*) AS image_length, MIN(image) AS image FROM vehicle_image GROUP BY vehicle_id) AS vehicle_image'), 'vehicle.id', '=', 'vehicle_image.vehicle_id')
                                 ->whereNull('vehicle.deleted_at')
@@ -177,7 +179,13 @@ class StockController extends Controller
         if(!is_null($request->to_year)){
             $vehicle_data = $vehicle_data->whereRaw('CONVERT(SUBSTR(`vehicle`.registration, 1, 4), SIGNED) <= ?', $request->to_year);
             // $vehicle_data = $vehicle_data->where('year', '<=', $request->to_year);  
-        }                
+        } 
+        if(!is_null($request->from_price)){
+            $vehicle_data = $vehicle_data->whereRaw('ROUND(price / ?) >= ?', [$rate, $request->from_price]);
+        } 
+        if(!is_null($request->to_price)){
+            $vehicle_data = $vehicle_data->whereRaw('ROUND(price / ?) <= ?', [$rate, $request->to_price]);
+        }               
         if ($request->ajax()) {
             // filter section                                
             if(isset($request->body_type)){
@@ -234,8 +242,7 @@ class StockController extends Controller
                     $vehicle_data = $vehicle_data->orderBy('vehicle.created_at', 'desc');
                 }
             }
-            $vehicle_data = $vehicle_data->paginate(10);
-            // dd($vehicle_data);
+            $vehicle_data = $vehicle_data->paginate(12);
             return view('front.pages.stock.list', [
                 'vehicle_data' => $vehicle_data,
                 'rate' => $rate,
@@ -246,8 +253,7 @@ class StockController extends Controller
         if(!$request->all()){
             $vehicle_data = $vehicle_data->orderBy('vehicle.id', 'desc');    
         }
-        $vehicle_data = $vehicle_data->paginate(10);
-        // dd($vehicle_data);
+        $vehicle_data = $vehicle_data->paginate(12);
         return view('front.pages.stock.index', [
             'vehicle_data' => $vehicle_data,
             'models' => $models,
