@@ -471,6 +471,27 @@
               <p>Tel : <a href="tel:+81298190850"> +81-29-819-0850</a></p>
               <p>Fax : <a href="tel:+81298683669">+81-29-868-3669</a></p>
               <p>WhatsApp : <a href="https://wa.me/819093450908">+81-90-9345-0908</a></p>
+            @elseif($is_contact == 'customer_inquiry')
+              <p>Dear {{$customer_name}},</p>
+              <p>Thank you for your inquiry about our vehicle!</p>
+              <p><strong>Vehicle Details:</strong></p>
+              <ul>
+                <li><strong>Vehicle:</strong> {{$vehicle_name}}</li>
+                <li><strong>Stock No:</strong> {{$stock_no}}</li>
+                <li><strong>Total Price:</strong> {{$total_price}}</li>
+                <li><strong>Quotation ID:</strong> SM-{{$inquiry_id}}</li>
+              </ul>
+              <p>Please find attached your detailed quotation PDF with complete vehicle information and pricing breakdown.</p>
+              <p>If you have any questions or would like to proceed with the purchase, please don't hesitate to contact us.</p>
+              <p>To track your inquiry and manage your account, please <a href="{{route('front.customer.login')}}">login to your customer portal</a>.</p>
+              <p>Thank you for choosing Sakura Motors!</p><br>
+              <a href="https://sakuramotors.com/">Sakura Motors Co.Ltd.</a><br>
+              <p>Address : 3-48-48, Gakuen Minami, Tsukuba-Shi,</p>
+              <p>Ibaraki Prefecture, Japan 305-0818.</p>
+              <p>E-mail : <a href="mailto:info@sakuramotors.com">info@sakuramotors.com</a></p>
+              <p>Tel : <a href="tel:+81298190850"> +81-29-819-0850</a></p>
+              <p>Fax : <a href="tel:+81298683669">+81-29-868-3669</a></p>
+              <p>WhatsApp : <a href="https://wa.me/819093450908">+81-90-9345-0908</a></p>
             @else
             <tr>
                 <td>

@@ -9,16 +9,16 @@
     <li class="breadcrumb-item active">Billing History for Invoice SM-{{ $inquiry->id }}</li>
 @endsection
 
-@section('content')
-<div class="content-card">
-    <div class="card-header bg-transparent border-0 p-4 d-flex align-items-center">
-        <h5 class="mb-0 me-3">Billing History for Invoice SM-{{ $inquiry->id }}</h5>
-        <span class="badge bg-success">
-            <i class="fas fa-check me-1"></i>
+@section('dashboard-content')
+<div class="content-section">
+    <div class="billing-header">
+        <h5 class="billing-title">Billing History for Invoice SM-{{ $inquiry->id }}</h5>
+        <span class="status-badge status-payment-received">
+            <i class="fas fa-check"></i>Paid
         </span>
     </div>
-    
-    <div class="card-body p-4">
+
+    <div class="billing-content">
         <!-- Payment History Table -->
         <div class="table-responsive mb-4">
             <table class="table table-hover">

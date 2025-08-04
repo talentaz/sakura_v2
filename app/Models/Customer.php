@@ -25,12 +25,11 @@ class Customer extends Authenticatable
 
     /**
      * Get the country that the customer belongs to.
-     * Note: Uncomment this when Country model is created
      */
-    // public function country()
-    // {
-    //     return $this->belongsTo(Country::class, 'country_id');
-    // }
+    public function country()
+    {
+        return $this->belongsTo(Port::class, 'country_id');
+    }
 
     /**
      * Get the inquiries for the customer.

@@ -71,6 +71,9 @@ Route::prefix('/customer')->middleware(['auth:customer'])->group(function () {
     Route::get('/chatroom/{id}', [App\Http\Controllers\Frontend\UserController::class, 'chatDetail'])->name('front.customer.chatdetail');
     Route::get('/changepassword', [App\Http\Controllers\Frontend\UserController::class, 'changePassword'])->name('front.customer.changepassword');
     Route::post('/comments/create', [App\Http\Controllers\Frontend\UserController::class, 'comments'])->name('front.customer.comment_create');
+
+    //generate quitatoin and invoice template
+    Route::get('/customer/inquiry/{id}/generate-pdf', [App\Http\Controllers\Frontend\CustomerDashboardController::class, 'generatePDF'])->name('customer.inquiry.generate-pdf');
 });
 
 // Legacy User Routes (keeping for backward compatibility)
@@ -243,3 +246,4 @@ Route::post('/update-password/{id}', [App\Http\Controllers\HomeController::class
 
 //Language Translation
 Route::get('index/{locale}', [App\Http\Controllers\HomeController::class, 'lang']);
+

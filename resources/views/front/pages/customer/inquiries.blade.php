@@ -10,54 +10,56 @@
 
 @section('dashboard-content')
 <div class="content-section">
+    <h5>Submitted Inquiries</h5>
     <div class="table-container">
         @if($inquiries->count() > 0)
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Action</th>
-                        <th>Stock No</th>
-                        <th>Submission Date</th>
-                        <th>Vehicle Name</th>
-                        <th>Total Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($inquiries as $inquiry)
-                    <tr>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="action-btn action-btn-delete" title="Delete">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                                <button class="action-btn action-btn-download" title="Download">
-                                    <i class="fas fa-download"></i>
-                                </button>
-                            </div>
-                        </td>
-                        <td>{{ $inquiry->stock_no ?? 'N/A' }}</td>
-                        <td>{{ $inquiry->created_at->format('M d, Y') }}</td>
-                        <td>{{ $inquiry->vehicle_name }}</td>
-                        <td>${{ number_format($inquiry->safe_total_price, 0) }}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Stock No</th>
+                            <th>Submission Date</th>
+                            <th>Vehicle Name</th>
+                            <th>Total Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($inquiries as $inquiry)
+                        <tr>
+                            <td>
+                                <div class="action-buttons">
+                                    <a class="action-btn action-btn-delete" target="_blank" href="{{ route('customer.inquiry.generate-pdf', $inquiry->id) }}" title="Quotation PDF">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </a>
+                                    <a class="action-btn action-btn-download" target="_blank" href="{{ route('admin.inquiry.generateInvoice', $inquiry->id) }}" title="View Invoice">
+                                        <i class="fas fa-file-invoice-dollar"></i>
+                                    </a>
+                                </div>
+                            </td>
+                            <td><strong>{{ $inquiry->stock_no ?? 'N/A' }}</strong></td>
+                            <td>{{ $inquiry->created_at->format('M d, Y') }}</td>
+                            <td>
+                                <div class="vehicle-name">{{ $inquiry->vehicle_name }}</div>
+                            </td>
+                            <td><strong>${{ number_format($inquiry->safe_total_price, 0) }}</strong></td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Pagination -->
             @if($inquiries->hasPages())
-                <div style="padding: 20px; border-top: 1px solid #dee2e6;">
+                <div class="pagination-wrapper">
                     {{ $inquiries->links() }}
                 </div>
             @endif
         @else
-            <div style="text-align: center; padding: 40px;">
-                <i class="fas fa-question-circle" style="font-size: 48px; color: #6c757d; margin-bottom: 20px;"></i>
-                <h6 style="color: #6c757d; margin-bottom: 10px;">No Inquiries Found</h6>
-                <p style="color: #6c757d; margin-bottom: 20px;">You haven't submitted any inquiries yet.</p>
-                <a href="{{ route('front.stock') }}" class="view-all-btn">
-                    <i class="fas fa-search" style="margin-right: 8px;"></i>Browse Vehicles
-                </a>
+            <div class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <h5>No Inquiries Found</h5>
+                <p>You haven't submitted any vehicle inquiries yet.</p>
             </div>
         @endif
     </div>
@@ -67,19 +69,9 @@
 @section('script')
 <script>
 $(document).ready(function() {
-    // Handle delete button clicks
-    $('.action-btn-delete').click(function() {
-        if (confirm('Are you sure you want to delete this inquiry?')) {
-            // Add delete functionality here
-            console.log('Delete inquiry');
-        }
-    });
-
-    // Handle download button clicks
-    $('.action-btn-download').click(function() {
-        // Add download functionality here
-        console.log('Download inquiry');
-    });
+  
 });
 </script>
 @endsection
+
+

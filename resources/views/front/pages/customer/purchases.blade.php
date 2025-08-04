@@ -10,10 +10,10 @@
 
 @section('dashboard-content')
 <div class="content-section">
-    <div class="table-container">
-        @if($purchases->count() > 0)
-            <table class="data-table">
-                <thead>
+    @if($purchases->count() > 0)
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
                     <tr>
                         <th>Action</th>
                         <th>Invoice Number</th>
@@ -38,41 +38,46 @@
                             </div>
                         </td>
                         <td>SM-{{ $purchase->id }}</td>
-                        <td>{{ $purchase->created_at->format('M d, Y') }}</td>
-                        <td>{{ $purchase->vehicle_name }}</td>
+                        <td class="date-display">{{ $purchase->created_at->format('M d, Y') }}</td>
+                        <td>
+                            <div class="vehicle-info">
+                                <div class="vehicle-name">{{ $purchase->vehicle_name }}</div>
+                            </div>
+                        </td>
                         <td>
                             @php
                                 $statusText = $purchase->vehicle_status ?? 'Open';
-                                $statusColor = '#6c757d';
+                                $statusClass = 'status-open';
 
                                 switch($statusText) {
                                     case 'Payment Received':
-                                        $statusColor = '#28a745';
+                                        $statusClass = 'status-payment-received';
                                         break;
                                     case 'Shipping':
-                                        $statusColor = '#17a2b8';
+                                        $statusClass = 'status-shipped';
                                         break;
                                     case 'Document':
-                                        $statusColor = '#ffc107';
+                                        $statusClass = 'status-open';
                                         break;
                                 }
                             @endphp
-                            <span style="background: {{ $statusColor }}; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">
+                            <span class="status-badge {{ $statusClass }}">
                                 {{ $statusText }}
                             </span>
                         </td>
-                        <td>${{ number_format($purchase->safe_total_price, 0) }}</td>
+                        <td class="price-display">${{ number_format($purchase->safe_total_price, 0) }}</td>
                     </tr>
                     @endforeach
                 </tbody>
             </table>
+        </div>
 
-            <!-- Pagination -->
-            @if($purchases->hasPages())
-                <div style="padding: 20px; border-top: 1px solid #dee2e6;">
-                    {{ $purchases->links() }}
-                </div>
-            @endif
+        <!-- Pagination -->
+        @if($purchases->hasPages())
+            <div class="pagination-wrapper">
+                {{ $purchases->links() }}
+            </div>
+        @endif
         @else
             <div style="text-align: center; padding: 40px;">
                 <i class="fas fa-shopping-cart" style="font-size: 48px; color: #6c757d; margin-bottom: 20px;"></i>

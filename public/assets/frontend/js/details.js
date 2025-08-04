@@ -477,10 +477,28 @@ function copyLink() {
 function formatOption(data) {
     if (!data.id) return data.text;
 
-    const price = $(data.element).data("price") || "";
     const subtitle = $(data.element).data("subtitle") || "";
     const selectedValue = $("#salaamSelect").val();
     const isActive = data.id == selectedValue ? "active" : "";
+
+    // Calculate port price based on vehicle body type
+    let portPrice = "";
+    try {
+        const portData = JSON.parse(data.id);
+        const bodyType = $(".body-type-hidden").val() || "";
+
+        if (portData && bodyType) {
+            for (let i = 0; i < portData.length; i++) {
+                if (bodyType === Object.keys(portData[i])[0]) {
+                    portPrice = "$" + portData[i][bodyType];
+                    break;
+                }
+            }
+        }
+    } catch (error) {
+        console.log("Error parsing port data:", error);
+        portPrice = "";
+    }
 
     const html = `
   <div class="custom-option-card ${isActive}">
@@ -492,7 +510,7 @@ function formatOption(data) {
       <div class="title">${data.text}</div>
       <div class="subtitle">${subtitle}</div>
     </div>
-    <div class="price">${price}</div>
+    <div class="price">${portPrice}</div>
   </div>
 `;
 
@@ -570,9 +588,36 @@ function activateDropdown(selector, useCustom) {
 
 $(document).ready(function () {
     activateDropdown("#salaamSelect", true);
-
     activateDropdown("#makeSelect", false);
     activateDropdown("#makeSelectCountry", false);
+
+    // Initialize price calculation AFTER dropdowns are activated
+    initializePriceCalculation();
+
+    // Calculate price when button is clicked
+    $(document).on("click", "#calc-final-price", function (e) {
+        e.preventDefault();
+        calculateFinalPrice();
+    });
+
+    // Recalculate when country changes
+    $("#makeSelect").on("change", function () {
+        loadPortsForCountry($(this).val());
+    });
+
+    // Recalculate when port changes
+    $("#salaamSelect").on("change", function () {
+        calculateFinalPrice();
+    });
+
+    // Recalculate when inspection/insurance changes
+    $('input[name="inspection"], input[name="insurance"]').on(
+        "change",
+        function () {
+            updateHiddenValues();
+            calculateFinalPrice();
+        }
+    );
 
     $(".vs-select-wrapper").on("click", function (e) {
         if ($(e.target).closest(".select2-container").length) return;
@@ -647,3 +692,292 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.removeItem("showOfferBox");
     }
 });
+
+$(document).ready(function () {
+    // Initialize price calculation on page load
+    initializePriceCalculation();
+
+    // Calculate price when button is clicked
+    $(document).on("click", "#calc-final-price", function (e) {
+        e.preventDefault();
+        calculateFinalPrice();
+    });
+
+    // Recalculate when country changes
+    $("#makeSelect").on("change", function () {
+        loadPortsForCountry($(this).val());
+    });
+
+    // Recalculate when port changes
+    $("#salaamSelect").on("change", function () {
+        calculateFinalPrice();
+    });
+
+    // Recalculate when inspection/insurance changes
+    $('input[name="inspection"], input[name="insurance"]').on(
+        "change",
+        function () {
+            updateHiddenValues();
+            calculateFinalPrice();
+        }
+    );
+});
+
+function initializePriceCalculation() {
+    // Get URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const country = urlParams.get("country");
+    const port = urlParams.get("port");
+    const inspection = urlParams.get("inspection");
+    const insurance = urlParams.get("insurance");
+
+    // Check localStorage first, then URL parameters
+    const savedCountry = localStorage.getItem("selected_country");
+    if (country) {
+        $("#makeSelect").val(country).trigger("change");
+        localStorage.setItem("selected_country", country);
+    } else if (savedCountry) {
+        // Override the server-side selected country with localStorage value
+        $("#makeSelect").val(savedCountry).trigger("change");
+    }
+
+    if (inspection) {
+        $(`input[name="inspection"][data-id="${inspection}"]`).prop(
+            "checked",
+            true
+        );
+        $(".insp-value").val(inspection);
+    } else {
+        const savedInspection = localStorage.getItem("inspection_price");
+        if (savedInspection) {
+            $(`input[name="inspection"][data-id="${savedInspection}"]`).prop(
+                "checked",
+                true
+            );
+            $(".insp-value").val(savedInspection);
+        }
+    }
+
+    if (insurance) {
+        $(`input[name="insurance"][data-id="${insurance}"]`).prop(
+            "checked",
+            true
+        );
+        $(".insu-value").val(insurance);
+    } else {
+        const savedInsurance = localStorage.getItem("insurance_price");
+        if (savedInsurance) {
+            $(`input[name="insurance"][data-id="${savedInsurance}"]`).prop(
+                "checked",
+                true
+            );
+            $(".insu-value").val(savedInsurance);
+        }
+    }
+
+    // Load ports and calculate initial price
+    const selectedCountry = country || savedCountry || $("#makeSelect").val();
+    const savedPortArray = localStorage.getItem("port_array");
+
+    if (selectedCountry) {
+        if (port) {
+            loadPortsForCountry(selectedCountry, port);
+        } else if (savedPortArray) {
+            loadPortsForCountry(selectedCountry, savedPortArray);
+        } else {
+            loadPortsForCountry(selectedCountry);
+        }
+    }
+}
+
+function loadPortsForCountry(countryId, selectedPort = null) {
+    if (!countryId) return;
+
+    $.ajax({
+        url: select_port,
+        data: { id: countryId },
+        type: "get",
+        success: function (response) {
+            const portList = response.port_list;
+            const portArray = $.map(portList, function (value, index) {
+                return [[index, value]];
+            });
+
+            let html = "";
+            if (portArray) {
+                for (let i = 0; i < portArray.length; i++) {
+                    const isSelected =
+                        selectedPort &&
+                        JSON.stringify(portArray[i][1]) === selectedPort
+                            ? "selected"
+                            : "";
+                    html += `<option value='${JSON.stringify(
+                        portArray[i][1]
+                    )}' ${isSelected}>${capitalizeFirstLetter(
+                        portArray[i][0]
+                    )}</option>`;
+                }
+            }
+            html += '<option value="0"></option>';
+
+            $("#salaamSelect").html(html);
+            calculateFinalPrice();
+        },
+        error: function () {
+            console.log("Server error occurred");
+        },
+    });
+}
+
+function updateHiddenValues() {
+    const inspectionValue =
+        $('input[name="inspection"]:checked').data("id") || 0;
+    const insuranceValue = $('input[name="insurance"]:checked').data("id") || 0;
+
+    $(".insp-value").val(inspectionValue);
+    $(".insu-value").val(insuranceValue);
+}
+
+function calculateFinalPrice() {
+    const portValue = $("#salaamSelect").val();
+    if (!portValue || portValue === "0") {
+        $(".total-price-value").text("ASK");
+        $(".stock-price-info h1:last-child").text("ASK");
+        return;
+    }
+
+    try {
+        // Parse port data - handle both old array and new object structure
+        let portArray;
+        let portPrice = 0;
+        const portName = $("#salaamSelect option:selected")
+            .text()
+            .toLowerCase();
+
+        try {
+            portArray = JSON.parse(portValue);
+        } catch (e) {
+            console.error("Error parsing port data:", e);
+            $(".total-price-value").text("ASK");
+            return;
+        }
+
+        const inspectionPrice = parseInt($(".insp-value").val()) || 0;
+        const insurancePrice = parseInt($(".insu-value").val()) || 0;
+        const vehiclePrice = parseInt($(".vehicle-price-hidden").val()) || 0;
+        const cubicMeter = parseFloat($(".cubic-meter-hidden").val()) || 0;
+        const bodyType = $(".body-type-hidden").val() || "";
+
+        // Handle new object structure (port names as keys)
+        if (
+            portArray &&
+            typeof portArray === "object" &&
+            !Array.isArray(portArray)
+        ) {
+            if (portArray[portName]) {
+                const portData = portArray[portName];
+                for (let i = 0; i < portData.length; i++) {
+                    if (bodyType === Object.keys(portData[i])[0]) {
+                        portPrice = parseInt(portData[i][bodyType]);
+                        break;
+                    }
+                }
+            }
+        }
+        // Handle old array structure
+        else if (Array.isArray(portArray)) {
+            for (let i = 0; i < portArray.length; i++) {
+                if (bodyType === Object.keys(portArray[i])[0]) {
+                    portPrice = parseInt(portArray[i][bodyType]);
+                    break;
+                }
+            }
+        }
+
+        if (portPrice === 0) {
+            $(".total-price-value").text("ASK");
+            $(".stock-price-info h1:last-child").text("ASK");
+            return;
+        }
+
+        const shippingPrice = portPrice * cubicMeter;
+        console.log("portPrice", portPrice);
+        console.log("cubicMeter", cubicMeter);
+        console.log("shippingPrice", shippingPrice);
+        console.log("vehiclePrice", vehiclePrice);
+        const finalPrice = Math.round(
+            vehiclePrice + shippingPrice + inspectionPrice + insurancePrice
+        );
+
+        // Format the final price
+        const formattedPrice = "$" + finalPrice.toLocaleString();
+
+        $(".total-price-value").text(formattedPrice);
+        $(".stock-price-info h1:last-child").text(formattedPrice);
+
+        // Update CIF text based on inspection/insurance
+        let cif = "";
+        if (inspectionPrice === 0 && insurancePrice === 0) {
+            cif = "( C&F )";
+        } else if (inspectionPrice === 0) {
+            cif = "( CIF )";
+        } else if (insurancePrice === 0) {
+            cif = "( C&F Inspect )";
+        } else {
+            cif = "( CIF Inspect )";
+        }
+
+        $(".cif p").text(cif + " " + $("#salaamSelect option:selected").text());
+
+        // Update inquiry form hidden fields
+        updateInquiryForm(
+            finalPrice,
+            portPrice,
+            inspectionPrice,
+            insurancePrice
+        );
+    } catch (error) {
+        console.error("Error calculating price:", error);
+        $(".total-price-value").text("ASK");
+        $(".stock-price-info h1:last-child").text("ASK");
+    }
+}
+
+function updateInquiryForm(
+    finalPrice,
+    portPrice,
+    inspectionPrice,
+    insurancePrice
+) {
+    $(".inqu_fob_price").val($(".vehicle-price-hidden").val());
+    $(".inqu_inspection").val(inspectionPrice);
+    $(".inqu_insurance").val(insurancePrice);
+    $(".inqu_port").val(portPrice);
+    $(".inqu_total_price").val("$" + finalPrice.toLocaleString());
+    $(".inqu_url").val(window.location.href);
+}
+
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+// Add scroll to inquiry section when Next button is clicked
+$("button.vs-search-btn")
+    .filter(function () {
+        return $(this).text().trim().includes("Next");
+    })
+    .on("click", function (e) {
+        e.preventDefault();
+        const inquirySection = $(".box h2:contains('Get Inquiry')").closest(
+            ".box"
+        );
+        console.log("inquirySection", inquirySection);
+        if (inquirySection.length) {
+            $("html, body").animate(
+                {
+                    scrollTop: inquirySection.offset().top - 100,
+                },
+                800
+            );
+        }
+    });

@@ -310,13 +310,16 @@ class StockController extends Controller
         $inspection = '';
         $insurance = '';
         if($request->has('total_price')){
-            $current_country = Port::where('id', $request->country)->first();
+            $country_from_request = Port::where('id', $request->country)->first();
+            if($country_from_request) {
+                $current_country = $country_from_request;
+            }
             $total_price = $request->total_price;
             $port = $request->port;
             $inspection = $request->inspection;
             $insurance = $request->insurance;
         }
-        if($current_country->port) {
+        if($current_country && $current_country->port) {
             $port_count = count(json_decode($current_country->port));
             $port_key = json_decode($current_country->port);
             $port_price = json_decode($current_country->price);    
@@ -327,7 +330,7 @@ class StockController extends Controller
         }
         // create new port array
         $port_list = [];
-        if($current_country->port){
+        if($current_country && $current_country->port){
             // $port_unique_name =  array_values(array_unique(json_decode($current_country->port)));
             $port_unique_name = array_values(array_unique(array_map('strtolower', json_decode($current_country->port, true))));
             $port_array = json_decode($current_country->port_array);

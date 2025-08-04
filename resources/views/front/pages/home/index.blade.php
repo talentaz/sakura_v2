@@ -114,7 +114,7 @@
             <!-- Vehicle Types -->
             <div class="vehicle-types">
               @foreach ($vehicle_type as $row)
-              <a href="large-bus.html" class="grid-item">
+              <a href="{{route('front.stock')}}{{'/?body_type='}}{{$row->vehicle_type}}" class="grid-item">
                 <div class="grid-item-title">
                   {{$row->vehicle_type}} ({{ $row->cnt }})
                   <span class="arrow-icon"
@@ -133,7 +133,7 @@
             <!-- Vehicle Makes -->
             <div class="vehicle-makes">
               @foreach ($make_type as $row)
-              <a href="tayota.html" class="grid-item">
+              <a href="{{route('front.stock')}}{{'/?make_type='}}{{$row->maker_type}}" class="grid-item">
                 <div class="grid-item-title">
                   {{$row->maker_type}} ({{ $row->cnt }})
                   <span class="arrow-icon"

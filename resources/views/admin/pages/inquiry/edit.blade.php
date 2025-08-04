@@ -100,11 +100,11 @@
                                             <div class="d-flex align-items-center">
                                                 <select class="form-select form-select-sm me-2" name="sales_agent" style="flex: 1;">
                                                     <option value="">Select Agent</option>
-                                                    <option value="Nalaka De Soya" {{ $inquiry->sales_agent === 'Nalaka De Soya' ? 'selected' : '' }}>Nalaka De Soya</option>
-                                                    <option value="John Doe" {{ $inquiry->sales_agent === 'John Doe' ? 'selected' : '' }}>John Doe</option>
-                                                    <option value="Jane Smith" {{ $inquiry->sales_agent === 'Jane Smith' ? 'selected' : '' }}>Jane Smith</option>
-                                                    <option value="Mike Johnson" {{ $inquiry->sales_agent === 'Mike Johnson' ? 'selected' : '' }}>Mike Johnson</option>
-                                                    <option value="Sarah Wilson" {{ $inquiry->sales_agent === 'Sarah Wilson' ? 'selected' : '' }}>Sarah Wilson</option>
+                                                    @foreach($users as $user)
+                                                        <option value="{{ $user->id }}" {{ $inquiry->sales_agent == $user->id ? 'selected' : '' }}>
+                                                            {{ $user->name }} ({{ $user->email }})
+                                                        </option>
+                                                    @endforeach
                                                 </select>
                                                 <button type="submit" class="btn btn-update">
                                                     <i class="mdi mdi-check"></i> Update
@@ -112,9 +112,9 @@
                                             </div>
                                         </form>
                                     </div>
-                                    @if($inquiry->sales_agent)
+                                    <!-- @if($inquiry->sales_agent)
                                         <small class="text-muted">Current: {{ $inquiry->sales_agent }}</small>
-                                    @endif
+                                    @endif -->
                                 </div>
                             </div>
 
@@ -362,3 +362,4 @@
     });
 </script>
 @endsection
+

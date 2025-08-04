@@ -69,8 +69,8 @@
                             <p class="description-text">Inspection & Insurance</p>
                             <p class="final-country"> Final Country</p>
                         @else
-                            <p class="original-price">was ${{number_format(round($row->sale_price/$rate))}}</p>
-                            <p class="main-price price-green"><i class="fa-solid fa-circle-arrow-down-right"></i> ${{number_format(round($row->price/$rate))}} <span class="price-fob-text">Price (FOB)</span></p>
+                            <p class="original-price">was ${{number_format(round($row->price/$rate))}}</p>
+                            <p class="main-price price-green"><i class="fa-solid fa-circle-arrow-down-right"></i> ${{number_format(round($row->sale_price/$rate))}} <span class="price-fob-text">Price (FOB)</span></p>
                             <p class="description-text">Inspection & Insurance</p>
                             <p class="final-country"> Final Country</p>
                         @endif

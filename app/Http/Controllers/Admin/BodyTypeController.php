@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use DB, Validator, Exception, Image, URL;
+use Illuminate\Support\Facades\File;
 use App\Models\VehicleType;
 
 class BodyTypeController extends Controller
@@ -78,4 +79,5 @@ class BodyTypeController extends Controller
         return response()->json(['result' => true]);
     }
 }
+
 

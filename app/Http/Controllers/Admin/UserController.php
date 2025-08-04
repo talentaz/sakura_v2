@@ -12,11 +12,14 @@ use Session;
 class UserController extends Controller
 {
     public function index(Request $request)
-    {
-        $data = User::with('role')->where('role_id', 2)->orderBy('id', 'DESC')->get();
-        
+{
+        $data = User::with('role')
+            ->where('id', '!=', auth()->id())
+            ->orderBy('id', 'DESC')
+            ->get();
+
         return view('admin.pages.user.index', [
-            'data'  => $data,
+            'data' => $data,
         ]);
     }
 

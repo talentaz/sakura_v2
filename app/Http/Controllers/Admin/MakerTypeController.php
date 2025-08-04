@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use DB, Validator, Exception, Image, URL;
+use Illuminate\Support\Facades\File;
 use App\Models\MakerType;
+
 
 class MakerTypeController extends Controller
 {

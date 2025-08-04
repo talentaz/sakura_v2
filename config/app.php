@@ -177,6 +177,7 @@ return [
         Stevebauman\Location\LocationServiceProvider::class,
         Laravolt\Avatar\ServiceProvider::class,
         Yajra\DataTables\DataTablesServiceProvider::class,
+        Barryvdh\DomPDF\ServiceProvider::class,
 
     ],
 
@@ -234,6 +235,7 @@ return [
         'Location' => 'Stevebauman\Location\Facades\Location',
         'Avatar'    => Laravolt\Avatar\Facade::class,
         'DataTables' => Yajra\DataTables\Facades\DataTables::class,
+        'PDF' => Barryvdh\DomPDF\Facade\Pdf::class,
     ],
 
 ];

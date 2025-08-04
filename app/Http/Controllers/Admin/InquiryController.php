@@ -77,7 +77,14 @@ class InquiryController extends Controller
     public function edit($id)
     {
         $inquiry = Inquiry::findOrFail($id);
-        return view('admin.pages.inquiry.edit', compact('inquiry'));
+        $users = User::with('role')
+            ->where('id', '!=', auth()->id())
+            ->orderBy('id', 'DESC')
+            ->get();
+        return view('admin.pages.inquiry.edit', [
+            'inquiry' => $inquiry,
+            'users' => $users,
+        ]);
     }
 
     /**
@@ -190,7 +197,8 @@ class InquiryController extends Controller
 
         $pdf = PDF::loadView('admin.pages.inquiry.pdf', compact('inquiry'));
 
-        return $pdf->download('quotation-' . $inquiry->id . '.pdf');
+        return $pdf->stream('quotation-' . $inquiry->id . '.pdf');
+        // return $pdf->download('quotation-' . $inquiry->id . '.pdf');
     }
 
     /**

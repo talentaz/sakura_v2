@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Customer;
 use App\Models\Inquiry;
 use App\Models\Port;
+use PDF;
 
 class CustomerDashboardController extends Controller
 {
@@ -24,7 +25,7 @@ class CustomerDashboardController extends Controller
             ->with(['vehicle'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
-        
+
         return view('front.pages.customer.inquiries', compact('customer', 'inquiries'));
     }
     
@@ -49,11 +50,11 @@ class CustomerDashboardController extends Controller
      */
     public function profile()
     {
-        $customer = Auth::guard('customer')->user();
-        
+        $customer = Auth::guard('customer')->user()->load('country');
+
         // Get available countries from ports
         $countries = Port::select('country')->distinct()->orderBy('country')->get();
-        
+
         return view('front.pages.customer.profile', compact('customer', 'countries'));
     }
     
@@ -157,4 +158,21 @@ class CustomerDashboardController extends Controller
         
         return view('front.pages.customer.billing', compact('customer', 'inquiry', 'billingHistory', 'breakdown'));
     }
+
+    /**
+     * Generate PDF quotation for customer
+     */
+    public function generatePDF($id)
+    {
+        $customer = Auth::guard('customer')->user();
+        
+        // Ensure customer can only access their own inquiries
+        $inquiry = $customer->inquiries()->with(['vehicle', 'user'])->findOrFail($id);
+        
+        $pdf = PDF::loadView('admin.pages.inquiry.pdf', compact('inquiry'));
+        
+        return $pdf->stream('quotation-' . $inquiry->id . '.pdf');
+    }
 }
+
+

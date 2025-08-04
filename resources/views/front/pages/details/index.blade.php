@@ -242,14 +242,14 @@
                                     </div>
                                 </div>
 
-                                <button class="vs-search-btn">Calculate Final Price</button>
+                                <button class="vs-search-btn" type="button" id="calc-final-price">Calculate Final Price</button>
                             </form>
                             <div class="stock-price-info">
                                 <h1>Final Price</h1>
                                 @if($total_price)
-                                    <h1>{{ $total_price }}</h1>
+                                    <h1 class="total-price-value">{{ $total_price }}</h1>
                                 @else
-                                    <h1>-</h1>  
+                                    <h1 class="total-price-value">-</h1>
                                 @endif
                             </div>
                             <button class="vs-search-btn" type="button"><i class="fa-regular fa-magnifying-glass"></i>Next</button>
@@ -263,7 +263,8 @@
                                 </a>
                             </h2>
 
-                            <form id="contactForm">
+                            <form id="contactForm" method="post" action="{{ route('front.inquiry.email') }}">
+                                @csrf
                                 <input type="hidden" name="vehicle_name" value="{{($vehicle_data->make_type)}} {{$vehicle_data->model_type}} {{$vehicle_data->body_type}}">
                                 <input type="hidden" name="fob_price" class="inqu_fob_price" value="">
                                 <input type="hidden" name="inspection" class="inqu_inspection" value="">
@@ -271,19 +272,30 @@
                                 <input type="hidden" name="inqu_port" class="inqu_port" value="">
                                 <input type="hidden" name="total_price" class="inqu_total_price" value="">
                                 <input type="hidden" name="site_url" class="inqu_url" value="">
-                                <input type="hidden" name="stock_no" class="stock_no" value=""> 
+                                <input type="hidden" name="stock_no" class="stock_no" value="{{$vehicle_data->stock_no}}">
                                 <input type="hidden" name="vehicle_id" class="vehicle_id" value="{{$vehicle_data->id}}">
                                 <input type="hidden" name="user_id" class="user_id" value="{{isset(Auth::user()->id)?Auth::user()->id:''}}">
+                                    
+                                <!-- Hidden inputs for price calculation -->
+                                <!-- <input type="hidden" class="vehicle-price-hidden" value="{{$vehicle_data->price}}"> -->
+                                <!-- <input type="hidden" class="cubic-meter-hidden" value="{{$vehicle_data->cubic_meter}}"> -->
+                                <input type="hidden" class="body-type-hidden" value="{{$vehicle_data->body_type}}">
+                                <input type="hidden" class="stock-no" value="{{$vehicle_data->stock_no}}">
+                                <input type="hidden" class="insp-value" value="0">
+                                <input type="hidden" class="insu-value" value="0">
+                                <input type="hidden" class="vehicle-price-hidden" value="{{$vehicle_data->sale_price ? round($vehicle_data->sale_price/$rate->rate) : round($vehicle_data->price/$rate->rate)}}">
+                                <input type="hidden" class="cubic-meter-hidden" value="{{($vehicle_data->length * $vehicle_data->width * $vehicle_data->height)/1000000}}">
+                                <input type="hidden" class="body-type-hidden" value="{{$vehicle_data->body_type}}">
                                 <div class="form-group">
                                     <label for="name">Your Name</label>
-                                    <input type="text" id="name" placeholder="John Doe" name="inqu_name"/>
+                                    <input type="text" id="name" placeholder="John Doe" name="inqu_name" value="{{ Auth::guard('customer')->check() ? Auth::guard('customer')->user()->name : '' }}"/>
                                 </div>
                                 <div class="stock-flt-head">
                                     <h3>Select country</h3>
                                     <div class="vs-select-wrapper inspection">
                                         <select id="makeSelectCountry" class="vs-select" name="inqu_country">
                                             @foreach($country as $row)
-                                                <option value="{{$row->id}}" {{ $current_country->country == $row->country ? "selected" : "" }}>{{$row->country}}</option>
+                                                <option value="{{$row->id}}" {{ (Auth::guard('customer')->check() && Auth::guard('customer')->user()->country_id == $row->id) ? "selected" : "" }}>{{$row->country}}</option>
                                             @endforeach
                                         </select>
                                         <i class="fas fa-chevron-down vs-chevron"></i>
@@ -291,55 +303,189 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="email">Your Email</label>
-                                    <input type="email" id="email" placeholder="johndoe@gmail.com" name="inqu_email" />
+                                    <input type="email" id="email" placeholder="johndoe@gmail.com" name="inqu_email" value="{{ Auth::guard('customer')->check() ? Auth::guard('customer')->user()->email : '' }}" />
                                 </div>
 
                                 <div class="form-group">
                                     <label for="mobile">Mobile</label>
-                                    <input type="tel" id="mobile" name="inqu_mobile" placeholder="+1215626515" />
+                                    <input type="tel" id="mobile" name="inqu_mobile" placeholder="+1215626515" value="{{ Auth::guard('customer')->check() ? (Auth::guard('customer')->user()->mobile ?? '') : '' }}" />
                                 </div>
 
                                 <div class="form-group">
                                     <label for="city">City</label>
-                                    <input type="text" id="city" name="inqu_city" placeholder="City" />
+                                    <input type="text" id="city" name="inqu_city" placeholder="City" value="{{ Auth::check() ? Auth::user()->city : '' }}" />
                                 </div>
 
                                 <div class="form-group">
                                     <label for="address">Address</label>
-                                    <input type="text" id="address" name="inqu_address" placeholder="Address" />
+                                    <input type="text" id="address" name="inqu_address" placeholder="Address" value="{{ Auth::check() ? Auth::user()->address : '' }}" />
                                 </div>
 
                                 <div class="form-group">
                                     <label for="message">Message</label>
-                                    <textarea id="message" rows="4" placeholder="Enter here your message"></textarea>
+                                    <textarea id="message" name="inqu_comment" rows="4" placeholder="Enter here your message"></textarea>
                                 </div>
-                                <button class="vs-search-btn" type="submit"><i class="fa-regular fa-magnifying-glass"></i>Get a price quote now</button>
+                                <button type="button" class="vs-search-btn" id="quoteSubmitBtn">
+                                    <i class="fa-regular fa-magnifying-glass"></i>
+                                    <span class="btn-text">Get a price quote now</span>
+                                </button>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-        <!-- <section>
-            <div class="social-link-main">
-                <a href="#" class="social-link">
-                    <img src="{{ URL::asset('/assets/frontend/assets/facebook.svg') }}" alt="facebook" />
-                </a>
-                <a href="#" class="social-link">
-                    <img src="{{ URL::asset('/assets/frontend/assets/yt.svg') }}" alt="yt" />
-                </a>
-                <a href="#" class="social-link">
-                    <img src="{{ URL::asset('/assets/frontend/assets/insta.svg') }}" alt="insta" />
-                </a>
-            </div>
-        </section> -->
 @endsection
 @section('script')
 
 <script>
     var select_port = "{{route('front.select_port')}}";
-    var inq_url = "{{route('front.inquiry.email')}}";
+    var inquiry_url = "{{route('front.inquiry.email')}}";
     var light_url = "{{route('front.light_gallery')}}";
+    var login_url = "{{route('front.customer.login')}}";
+</script>
+<script>
+$(document).ready(function() {
+    // Handle quote submit button click (prevents double submission)
+    $('#quoteSubmitBtn').click(function (e){
+        e.preventDefault();
+        e.stopPropagation();
+        // Trigger price calculation to ensure we have the latest values
+        if (typeof calculateFinalPrice === 'function') {
+            calculateFinalPrice();
+        } else {
+            calculatePriceFallback();
+        }
+
+        // Get calculated values
+        var fobPrice = $('.vehicle-price-hidden').val() || '';
+        var inspectionValue = $('.insp-value').val() || '0';
+        var insuranceValue = $('.insu-value').val() || '0';
+        var portValue = $('.cif p').text() || '';
+        var totalPrice = $('.total-price-value').text() || 'ASK';
+        var stockNo = '{{$vehicle_data->stock_no}}';
+
+        // Clean up the total price - remove $ and commas for database storage
+        var cleanTotalPrice = totalPrice;
+        if (totalPrice !== 'ASK') {
+            cleanTotalPrice = totalPrice.replace(/[$,]/g, '').trim();
+        }
+
+        // Update hidden form fields
+        $('.inqu_fob_price').val(fobPrice);
+        $('.inqu_inspection').val(inspectionValue);
+        $('.inqu_insurance').val(insuranceValue);
+        $('.inqu_port').val(portValue);
+        $('.inqu_url').val(window.location.href);
+        $('.inqu_total_price').val(cleanTotalPrice);
+        $('.stock_no').val(stockNo);
+
+        // Validate required fields
+        var name = $('input[name="inqu_name"]').val().trim();
+        var email = $('input[name="inqu_email"]').val().trim();
+        var mobile = $('input[name="inqu_mobile"]').val().trim();
+        var country = $('select[name="inqu_country"]').val();
+
+        if (!name) {
+            toastr["error"]("Please enter your name");
+            $('input[name="inqu_name"]').focus();
+            return;
+        }
+
+        if (!email) {
+            toastr["error"]("Please enter your email");
+            $('input[name="inqu_email"]').focus();
+            return;
+        }
+
+        // Basic email validation
+        var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            toastr["error"]("Please enter a valid email address");
+            $('input[name="inqu_email"]').focus();
+            return;
+        }
+
+        if (!mobile) {
+            toastr["error"]("Please enter your mobile number");
+            $('input[name="inqu_mobile"]').focus();
+            return;
+        }
+
+        if (!country) {
+            toastr["error"]("Please select your country");
+            $('select[name="inqu_country"]').focus();
+            return;
+        }
+
+        var formData = new FormData($('#contactForm')[0]);
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $.ajax({
+            url: inquiry_url, // This should point to the correct route
+            method: 'post',
+            data: formData,
+            success: function (res) {
+                if(res.success) {
+                    toastr["success"](res.message);
+                    $('#contactForm')[0].reset();
+                    
+                    // Redirect to login page after 2 seconds
+                    setTimeout(function() {
+                        window.location.href = res.redirect_url || login_url;
+                    }, 2000);
+                } 
+            },
+            error: function (res){
+                console.log(res);
+                toastr["error"]("An error occurred. Please try again.");
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        })
+    });
+
+
+
+    // Fallback price calculation function
+    function calculatePriceFallback() {
+        try {
+            var vehiclePrice = parseInt($('.vehicle-price-hidden').val()) || 0;
+            var inspectionPrice = parseInt($('.insp-value').val()) || 0;
+            var insurancePrice = parseInt($('.insu-value').val()) || 0;
+
+            // If no port is selected, show ASK
+            var portValue = $('#salaamSelect').val() || $('#makeSelect').val();
+            if (!portValue || portValue === "0") {
+                $('.total-price-value').text('ASK');
+                $('.stock-price-info h1:last-child').text('ASK');
+                return;
+            }
+
+            // Basic calculation without shipping (if port data is not available)
+            var totalPrice = vehiclePrice + inspectionPrice + insurancePrice;
+            var formattedPrice = '$' + totalPrice.toLocaleString();
+
+            $('.total-price-value').text(formattedPrice);
+            $('.stock-price-info h1:last-child').text(formattedPrice);
+
+            // Update inquiry form fields
+            $('.inqu_fob_price').val(vehiclePrice);
+            $('.inqu_inspection').val(inspectionPrice);
+            $('.inqu_insurance').val(insurancePrice);
+            $('.inqu_total_price').val(formattedPrice);
+
+        } catch (error) {
+            console.error('Error in fallback price calculation:', error);
+            $('.total-price-value').text('ASK');
+            $('.stock-price-info h1:last-child').text('ASK');
+        }
+    }
+});
 </script>
 <script src="{{ URL::asset('/assets/frontend/js/details.js')}}"></script>
 @endsection
