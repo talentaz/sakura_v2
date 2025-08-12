@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class Inquiry extends Model
 {
@@ -91,11 +92,35 @@ class Inquiry extends Model
     }
 
     /**
+     * Get the sales agent user associated with the inquiry
+     */
+    public function salesAgent()
+    {
+        return $this->belongsTo(User::class, 'sales_agent');
+    }
+
+    /**
+     * Get the port/country associated with the inquiry
+     */
+    public function inquiryCountry()
+    {
+        return $this->belongsTo(Port::class, 'inqu_country', 'id');
+    }
+
+    /**
      * Get formatted reserved expiry date
      */
     public function getFormattedReservedExpiryDateAttribute()
     {
         return $this->reserved_expiry_date ? $this->reserved_expiry_date->format('M d, Y H:i') : null;
+    }
+
+    /**
+     * Get the invoice associated with the inquiry
+     */
+    public function invoice()
+    {
+        return $this->hasOne(Invoice::class);
     }
 
     /**
@@ -206,3 +231,6 @@ class Inquiry extends Model
         return $this->safeNumericValue($this->discount);
     }
 }
+
+
+

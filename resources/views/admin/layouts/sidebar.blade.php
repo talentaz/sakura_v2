@@ -114,6 +114,12 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{route('admin.invoice.index')}}">
+                        <i class="bx bx-receipt"></i>
+                        <span>Invoice List</span>
+                    </a>
+                </li>
+                <li>
                     <a href="{{route('admin.shipping.index')}}">
                         <i class="bx bx-store"></i>
                         <span>Shipping</span>

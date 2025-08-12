@@ -30,11 +30,11 @@
                         <h4 class="card-title mb-0">Inquiry List</h4>
                         <div>
                             <label for="entries-select">Show</label>
-                            <select id="entries-select" class="form-select d-inline-block w-auto">
-                                <option value="10">10</option>
-                                <option value="25">25</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
+                            <select id="entries-select" class="form-select d-inline-block w-auto" onchange="changePerPage()">
+                                <option value="10" {{ $perPage == 10 ? 'selected' : '' }}>10</option>
+                                <option value="25" {{ $perPage == 25 ? 'selected' : '' }}>25</option>
+                                <option value="50" {{ $perPage == 50 ? 'selected' : '' }}>50</option>
+                                <option value="100" {{ $perPage == 100 ? 'selected' : '' }}>100</option>
                             </select>
                             <span>entries</span>
                         </div>
@@ -61,13 +61,17 @@
                                     <td>{{ $inquiry->id ?? 'N/A' }}</td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <a href="{{ route('admin.inquiry.edit', $inquiry->id) }}" class="btn btn-sm btn-success">
+                                            <a href="{{ route('admin.inquiry.edit', $inquiry->id) }}" class="btn btn-sm btn-success" title="Edit">
                                                 <i class="mdi mdi-pencil"></i>
                                             </a>
-                                            <a href="javascript:void(0);" class="btn btn-sm btn-danger delete-inquiry"
-                                               data-id="{{ $inquiry->id ?? '' }}" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                                                <i class="mdi mdi-delete"></i>
+                                            <a href="{{ route('admin.inquiry.generatePDF', $inquiry->id) }}" class="btn btn-sm btn-danger" target="_blank" title="View Quotation PDF">
+                                                <i class="mdi mdi-file-pdf-outline"></i>
                                             </a>
+                                            @if($inquiry->invoice)
+                                                <a href="{{ route('admin.invoice.generatePDF', $inquiry->invoice->id) }}" class="btn btn-sm btn-info" target="_blank" title="View Invoice">
+                                                    <i class="mdi mdi-receipt"></i>
+                                                </a>
+                                            @endif
                                         </div>
                                     </td>
                                     <td>{{ $inquiry->inqu_name ?? 'N/A' }}</td>
@@ -100,6 +104,20 @@
                             </tbody>
                         </table>
                     </div>
+
+                    <!-- Pagination -->
+                    @if($inquiries->hasPages())
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div>
+                                <p class="text-muted">
+                                    Showing {{ $inquiries->firstItem() }} to {{ $inquiries->lastItem() }} of {{ $inquiries->total() }} entries
+                                </p>
+                            </div>
+                            <div>
+                                {{ $inquiries->appends(request()->query())->links() }}
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -107,29 +125,17 @@
 
 
 
-    <!-- Delete Modal -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Are you sure you want to delete this inquiry? This action cannot be undone.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" id="confirm-delete">Delete</button>
-                </div>
-            </div>
-        </div>
-    </div>
+
 @endsection
 
 @section('script')
 <script>
-    var delete_url = "{{ route('admin.inquiry.delete') }}"
+    function changePerPage() {
+        const perPage = document.getElementById('entries-select').value;
+        const url = new URL(window.location.href);
+        url.searchParams.set('per_page', perPage);
+        url.searchParams.delete('page'); // Reset to first page when changing per_page
+        window.location.href = url.toString();
+    }
 </script>
-<script src="{{ URL::asset('/assets/admin/pages/inquiry/index.js') }}"></script>
 @endsection

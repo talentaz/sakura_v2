@@ -17,4 +17,13 @@ class Vehicle extends Model
     const PAYMENT_RECEIVED = 'Payment Received';
     const SHIPPING = 'Shipping';
     const DOCUMENT = 'Document';
+
+    /**
+     * Get the vehicle images
+     */
+    public function vehicleImages()
+    {
+        return $this->hasMany(VehicleImage::class, 'vehicle_id');
+    }
 }
+

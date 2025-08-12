@@ -67,9 +67,21 @@
                     <a href="{{ route('admin.inquiry.generatePDF', $inquiry->id) }}" class="btn btn-danger btn-sm" target="_blank">
                         <i class="mdi mdi-file-pdf-outline"></i> Quotation PDF
                     </a>
-                    <a href="{{ route('admin.inquiry.generateInvoice', $inquiry->id) }}" class="btn btn-success btn-sm" target="_blank">
-                        <i class="mdi mdi-receipt"></i> View Invoice
-                    </a>
+                    @if($inquiry->invoice)
+                        <a href="{{ route('admin.inquiry.generateInvoice', $inquiry->id) }}" class="btn btn-success btn-sm" target="_blank">
+                            <i class="mdi mdi-receipt"></i> View Invoice
+                        </a>
+                        <a href="{{ route('admin.invoice.edit', $inquiry->id) }}" class="btn btn-info btn-sm">
+                            <i class="mdi mdi-file-document-edit"></i> Manage Billing
+                        </a>
+                    @else
+                        <form action="{{ route('admin.inquiry.createInvoice', $inquiry->id) }}" method="POST" style="display: inline;">
+                            @csrf
+                            <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to create an invoice for this inquiry?')">
+                                <i class="mdi mdi-receipt"></i> Proceed to Invoice
+                            </button>
+                        </form>
+                    @endif
                 </div>
                 <a href="{{ route('admin.inquiry.index') }}" class="btn btn-secondary">
                     <i class="mdi mdi-arrow-left"></i> Back to List
@@ -92,34 +104,29 @@
                             <div class="row mb-2">
                                 <div class="col-lg-5 font-weight-bold">Sales Agent</div>
                                 <div class="col-lg-7">
-                                    <div class="update-form">
-                                        <form action="{{ route('admin.inquiry.update', $inquiry->id) }}" method="POST">
-                                            @csrf
-                                            @method('PUT')
-                                            <input type="hidden" name="update_type" value="sales_agent">
-                                            <div class="d-flex align-items-center">
-                                                <select class="form-select form-select-sm me-2" name="sales_agent" style="flex: 1;">
-                                                    <option value="">Select Agent</option>
-                                                    @foreach($users as $user)
-                                                        <option value="{{ $user->id }}" {{ $inquiry->sales_agent == $user->id ? 'selected' : '' }}>
-                                                            {{ $user->name }} ({{ $user->email }})
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                                <button type="submit" class="btn btn-update">
-                                                    <i class="mdi mdi-check"></i> Update
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <!-- @if($inquiry->sales_agent)
-                                        <small class="text-muted">Current: {{ $inquiry->sales_agent }}</small>
-                                    @endif -->
+                                    <form action="{{ route('admin.inquiry.update', $inquiry->id) }}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+                                        <input type="hidden" name="update_type" value="sales_agent">
+                                        <div class="mb-2">
+                                            <select class="form-select" name="sales_agent">
+                                                <option value="">Select Agent</option>
+                                                @foreach($users as $user)
+                                                    <option value="{{ $user->id }}" {{ $inquiry->sales_agent == $user->id ? 'selected' : '' }}>
+                                                        {{ $user->name }} ({{ $user->email }})
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            <i class="mdi mdi-check"></i> Update
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-lg-5 font-weight-bold">Date Submitted</div>
+                                <div class="col-lg-5 font-weight-bold">Created At</div>
                                 <div class="col-lg-7">{{ $inquiry->created_at->format('M d, Y H:i') }}</div>
                             </div>
 
@@ -155,7 +162,7 @@
 
                             <div class="row mb-2">
                                 <div class="col-lg-5 font-weight-bold">Country</div>
-                                <div class="col-lg-7">{{ $inquiry->inqu_country }}</div>
+                                <div class="col-lg-7">{{ $inquiry->inquiryCountry->country ?? 'N/A' }}</div>
                             </div>
 
                             <div class="row mb-2">
@@ -175,20 +182,20 @@
                         <div class="card-body">
                             <div class="row mb-2">
                                 <div class="col-lg-5 font-weight-bold">Vehicle Stock No.</div>
-                                <div class="col-lg-7">#3652</div>
+                                <div class="col-lg-7">#{{ $inquiry->stock_no ?? $inquiry->vehicle->stock_no ?? 'N/A' }}</div>
                             </div>
 
                             <div class="row mb-2">
                                 <div class="col-lg-5 font-weight-bold">Vehicle Name</div>
-                                <div class="col-lg-7">Mitsubishi Rosa <a href="#" class="text-primary"><i class="mdi mdi-open-in-new"></i></a></div>
+                                <div class="col-lg-7">{{ $inquiry->vehicle_name ?? $inquiry->vehicle->name ?? 'N/A' }} <a href="{{ $inquiry->site_url }}" target = "_blank" class="text-primary"><i class="mdi mdi-open-in-new"></i></a></div>
                             </div>
 
                             <div class="row mb-2">
                                 <div class="col-lg-5 font-weight-bold">Vehicle Image</div>
                                 <div class="col-lg-7">
                                     <div class="vehicle-image-container">
-                                        @if($inquiry->vehicle_image)
-                                            <img src="{{ asset('storage/' . $inquiry->vehicle_image) }}" class="img-fluid rounded border" style="max-width: 150px; max-height: 100px; object-fit: cover;" alt="Vehicle Image">
+                                        @if($inquiry->vehicle && $inquiry->vehicle->vehicleImages->count() > 0)
+                                            <img src="{{ asset('uploads/vehicle/thumb/' . $inquiry->vehicle->vehicleImages[0]->image) }}" class="img-fluid rounded border" style="max-width: 150px; max-height: 100px; object-fit: cover;" alt="Vehicle Image">
                                         @else
                                             <div class="border rounded d-flex align-items-center justify-content-center bg-light" style="width: 150px; height: 100px;">
                                                 <div class="text-center text-muted">
@@ -204,51 +211,44 @@
                             <div class="row mb-2">
                                 <div class="col-lg-5 font-weight-bold">Vehicle Status</div>
                                 <div class="col-lg-7">
-                                    <div class="update-form">
-                                        <form action="{{ route('admin.inquiry.update', $inquiry->id) }}" method="POST">
-                                            @csrf
-                                            @method('PUT')
-                                            <input type="hidden" name="update_type" value="vehicle_status">
-                                            <div class="d-flex align-items-center">
-                                                <select class="form-select form-select-sm me-2" name="vehicle_status" id="vehicle-status-select" style="flex: 1;">
-                                                    <option value="Reserved" {{ $inquiry->vehicle_status === 'Reserved' ? 'selected' : '' }}>Reserved</option>
-                                                    <option value="Ready to Ship" {{ $inquiry->vehicle_status === 'Ready to Ship' ? 'selected' : '' }}>Ready to Ship</option>
-                                                    <option value="Open" {{ $inquiry->vehicle_status === 'Open' ? 'selected' : '' }}>Open</option>
-                                                    <option value="Inactive" {{ $inquiry->vehicle_status === 'Inactive' ? 'selected' : '' }}>Inactive</option>
-                                                </select>
-                                                <button type="submit" class="btn btn-update">
-                                                    <i class="mdi mdi-check"></i> Update
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
-                                    <span class="badge {{ $inquiry->vehicle_status === 'Reserved' ? 'bg-warning' : ($inquiry->vehicle_status === 'Ready to Ship' ? 'bg-success' : ($inquiry->vehicle_status === 'Open' ? 'bg-primary' : 'bg-secondary')) }}">
-                                        {{ $inquiry->vehicle_status ?: 'Reserved' }}
-                                    </span>
+                                    <form action="{{ route('admin.inquiry.update', $inquiry->id) }}" method="POST" id="vehicle-status-form">
+                                        @csrf
+                                        @method('PUT')
+                                        <input type="hidden" name="update_type" value="vehicle_status">
+                                        <div class="mb-2">
+                                            <select class="form-control" name="vehicle_status" id="vehicle-status-select">
+                                                @foreach($vehicle_status as $status)
+                                                    <option value="{{ $status }}" {{ $inquiry->vehicle_status === $status ? 'selected' : '' }}>
+                                                        {{ $status }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <button type="submit" class="btn btn-success btn-sm" id="vehicle-status-btn" style="{{ $inquiry->vehicle_status === 'Reserved' ? 'display: none;' : '' }}">
+                                            <i class="mdi mdi-check"></i> Update
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
 
                             <div class="row mb-2" id="expiry-date-section" style="{{ $inquiry->vehicle_status === 'Reserved' ? '' : 'display: none;' }}">
                                 <div class="col-lg-5 font-weight-bold">Reserved Expiry Date <span class="text-danger">*</span></div>
                                 <div class="col-lg-7">
-                                    <div class="update-form">
-                                        <form action="{{ route('admin.inquiry.update', $inquiry->id) }}" method="POST">
-                                            @csrf
-                                            @method('PUT')
-                                            <input type="hidden" name="update_type" value="reserved_expiry_date">
-                                            <div class="d-flex align-items-center">
-                                                <input type="datetime-local" class="form-control form-control-sm me-2" name="reserved_expiry_date"
-                                                       value="{{ $inquiry->reserved_expiry_date ? $inquiry->reserved_expiry_date->format('Y-m-d\TH:i') : '' }}" style="flex: 1;">
-                                                <button type="submit" class="btn btn-update">
-                                                    <i class="mdi mdi-check"></i> Update
-                                                </button>
-                                            </div>
-                                        </form>
-                                    </div>
+                                    <form action="{{ route('admin.inquiry.update', $inquiry->id) }}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+                                        <input type="hidden" name="update_type" value="reserved_expiry_date">
+                                        <div class="mb-2">
+                                            <input type="datetime-local" class="form-control" name="reserved_expiry_date"
+                                                   value="{{ $inquiry->reserved_expiry_date ? $inquiry->reserved_expiry_date->format('Y-m-d\TH:i') : '' }}" 
+                                                   placeholder="Reserved Expiry Date" required>
+                                        </div>
+                                        <button type="submit" class="btn btn-success btn-sm">
+                                            <i class="mdi mdi-check"></i> Update
+                                        </button>
+                                    </form>
                                     @if($inquiry->reserved_expiry_date)
                                         <small class="text-muted">Current: {{ $inquiry->reserved_expiry_date->format('M d, Y H:i') }}</small>
-                                    @else
-                                        <small class="text-muted">Jul 23, 2025 12:00 PM</small>
                                     @endif
                                 </div>
                             </div>
@@ -257,23 +257,23 @@
 
                             <div class="row mb-2">
                                 <div class="col-lg-5 font-weight-bold">Final Country</div>
-                                <div class="col-lg-7">Zambia</div>
+                                <div class="col-lg-7">{{ $inquiry->inquiryCountry->country ?? $inquiry->final_country ?? 'N/A' }}</div>
                             </div>
 
                             <div class="row mb-2">
                                 <div class="col-lg-5 font-weight-bold">Port Name</div>
-                                <div class="col-lg-7">Dar es Salaam</div>
+                                <div class="col-lg-7">{{ $inquiry->inqu_port ?? 'N/A' }}</div>
                             </div>
 
                             <div class="row mb-2">
                                 <div class="col-lg-5 font-weight-bold">Type of Purchase</div>
-                                <div class="col-lg-7">C&F</div>
+                                <div class="col-lg-7">{{ $inquiry->type_of_purchase ?? 'N/A' }}</div>
                             </div>
 
                             <div class="row mb-2">
                                 <div class="col-lg-5 font-weight-bold">Insurance</div>
                                 <div class="col-lg-7">
-                                    <span class="badge {{ $inquiry->insurance === 'Yes' ? 'bg-success' : 'bg-danger' }}">
+                                    <span class="badge {{ $inquiry->insurance ? 'bg-success' : 'bg-danger' }}">
                                         {{ $inquiry->insurance ?: 'No' }}
                                     </span>
                                 </div>
@@ -282,7 +282,7 @@
                             <div class="row mb-2">
                                 <div class="col-lg-5 font-weight-bold">Inspection</div>
                                 <div class="col-lg-7">
-                                    <span class="badge {{ $inquiry->inspection === 'Yes' ? 'bg-success' : 'bg-danger' }}">
+                                    <span class="badge {{ $inquiry->inspection  ? 'bg-success' : 'bg-danger' }}">
                                         {{ $inquiry->inspection ?: 'No' }}
                                     </span>
                                 </div>
@@ -294,43 +294,98 @@
                 <!-- Price Breakdown -->
                 <div class="col-md-4">
                     <div class="card">
-                        <div class="card-header bg-light">
-                            <h6 class="card-title mb-0 text-primary">Price Breakdown</h6>
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Price Breakdown</h5>
                         </div>
                         <div class="card-body">
-                            <div class="row mb-2">
-                                <div class="col-lg-5 font-weight-bold">FOB Price</div>
-                                <div class="col-lg-7">$7,197</div>
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <label class="form-label text-muted">FOB Price</label>
+                                </div>
+                                <div class="col-6">
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control text-end" name="fob_price" value="{{ $inquiry->fob_price ?? 0 }}" readonly>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="row mb-2">
-                                <div class="col-lg-5 font-weight-bold">Freight Fee</div>
-                                <div class="col-lg-7">$4,733</div>
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <label class="form-label text-muted">Freight Fee</label>
+                                </div>
+                                <div class="col-6">
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control text-end" name="freight_fee" value="{{ $inquiry->freight_fee ?? 0 }}" readonly>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="row mb-2">
-                                <div class="col-lg-5 font-weight-bold">Insurance Fee</div>
-                                <div class="col-lg-7">$0</div>
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <label class="form-label text-muted">Insurance Fee</label>
+                                </div>
+                                <div class="col-6">
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control text-end" name="insurance" value="{{ $inquiry->insurance ?? 0 }}" readonly>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="row mb-2">
-                                <div class="col-lg-5 font-weight-bold">Inspection Fee</div>
-                                <div class="col-lg-7">$0</div>
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <label class="form-label text-muted">Inspection Fee</label>
+                                </div>
+                                <div class="col-6">
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control text-end" name="inspection" value="{{ $inquiry->inspection ?? 0 }}" readonly>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="row mb-2">
-                                <div class="col-lg-5 font-weight-bold">- Discount</div>
-                                <div class="col-lg-7">$230</div>
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <label class="form-label text-muted">- Discount</label>
+                                </div>
+                                <div class="col-6">
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input type="number" class="form-control text-end" name="discount" value="{{ $inquiry->discount ?? 0 }}" onchange="calculateTotal()">
+                                    </div>
+                                </div>
                             </div>
 
                             <hr>
 
-                            <div class="row mb-2">
-                                <div class="col-lg-5 font-weight-bold h5">Total</div>
-                                <div class="col-lg-7 h4 text-primary font-weight-bold">$11,700</div>
-                            </div>
+                            <form action="{{ route('admin.inquiry.update', $inquiry->id) }}" method="POST">
+                                @csrf
+                                @method('PUT')
+                                <input type="hidden" name="update_type" value="total_discount">
+                                <input type="hidden" name="total_price" id="hidden-total" value="{{ ($inquiry->fob_price ?? 0) + ($inquiry->freight_fee ?? 0) + ($inquiry->insurance ?? 0) + ($inquiry->inspection ?? 0) - ($inquiry->discount ?? 0) }}">
+                                <input type="hidden" name="discount" id="hidden-discount" value="{{ $inquiry->discount ?? 0 }}">
+                                
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label fw-bold">Total</label>
+                                    </div>
+                                    <div class="col-6 text-end">
+                                        <span class="h5 text-primary fw-bold" id="total-display">
+                                            ${{ number_format(($inquiry->fob_price ?? 0) + ($inquiry->freight_fee ?? 0) + ($inquiry->insurance ?? 0) + ($inquiry->inspection ?? 0) - ($inquiry->discount ?? 0), 0) }}
+                                        </span>
+                                    </div>
+                                </div>
 
-                            <div class="mt-4 text-muted small price-notes">
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-success btn-sm">
+                                        <i class="mdi mdi-check"></i> Update
+                                    </button>
+                                </div>
+                            </form>
+
+                             <div class="mt-4 text-muted small price-notes">
                                 <p class="mb-1">** FOB Fee as of the date of requested quotation: Jul 20, 2025</p>
                                 <p class="mb-1">** Freight Fee = Port Fee + Vehicle Length (m) x Vehicle Width (m) x Vehicle Height (m)</p>
                                 <p class="mb-1">** Total = FOB Price + Freight Fee + Insurance Fee (if applicable) + Inspection Fee (if applicable) - Discount</p>
@@ -346,20 +401,54 @@
 
 @section('script')
 <script>
-    // Handle vehicle status change to show/hide expiry date section
-    document.addEventListener('DOMContentLoaded', function() {
-        const statusSelects = document.querySelectorAll('#vehicle-status-select');
-        statusSelects.forEach(function(select) {
-            select.addEventListener('change', function() {
-                const expirySection = document.getElementById('expiry-date-section');
-                if (this.value === 'Reserved') {
-                    expirySection.style.display = 'block';
-                } else {
-                    expirySection.style.display = 'none';
-                }
-            });
-        });
+$(document).ready(function() {
+    $('#vehicle-status-select').on('change', function() {
+        const expirySection = $('#expiry-date-section');
+        const statusBtn = $('#vehicle-status-btn');
+        
+        if ($(this).val() === 'Reserved') {
+            expirySection.show();
+            statusBtn.hide();
+        } else {
+            expirySection.hide();
+            statusBtn.show();
+        }
     });
+    
+    // Calculate total when discount changes
+    $('input[name="discount"]').on('input change', function() {
+        calculateTotal();
+    });
+});
+
+function calculateTotal() {
+    const fobPrice = parseFloat($('input[name="fob_price"]').val()) || 0;
+    const freightFee = parseFloat($('input[name="freight_fee"]').val()) || 0;
+    const insurance = parseFloat($('input[name="insurance"]').val()) || 0;
+    const inspection = parseFloat($('input[name="inspection"]').val()) || 0;
+    const discount = parseFloat($('input[name="discount"]').val()) || 0;
+    
+    const total = fobPrice + freightFee + insurance + inspection - discount;
+    
+    $('#total-display').text('$' + Math.round(total).toLocaleString());
+    
+    // Update hidden fields for form submission
+    $('#hidden-total').val(Math.round(total));
+    $('#hidden-discount').val(discount);
+}
+
 </script>
 @endsection
+
+
+
+
+
+
+
+
+
+
+
+
 

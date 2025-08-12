@@ -32,9 +32,11 @@
                                     <a class="action-btn action-btn-delete" target="_blank" href="{{ route('customer.inquiry.generate-pdf', $inquiry->id) }}" title="Quotation PDF">
                                         <i class="fas fa-file-pdf"></i>
                                     </a>
-                                    <a class="action-btn action-btn-download" target="_blank" href="{{ route('admin.inquiry.generateInvoice', $inquiry->id) }}" title="View Invoice">
+                                    @if($inquiry->invoice)
+                                    <a class="action-btn action-btn-download" target="_blank" href="{{ route('customer.invoice.generate-pdf', $inquiry->invoice->id) }}" title="View Invoice">
                                         <i class="fas fa-file-invoice-dollar"></i>
                                     </a>
+                                    @endif
                                 </div>
                             </td>
                             <td><strong>{{ $inquiry->stock_no ?? 'N/A' }}</strong></td>

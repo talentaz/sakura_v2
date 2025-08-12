@@ -73,7 +73,8 @@ Route::prefix('/customer')->middleware(['auth:customer'])->group(function () {
     Route::post('/comments/create', [App\Http\Controllers\Frontend\UserController::class, 'comments'])->name('front.customer.comment_create');
 
     //generate quitatoin and invoice template
-    Route::get('/customer/inquiry/{id}/generate-pdf', [App\Http\Controllers\Frontend\CustomerDashboardController::class, 'generatePDF'])->name('customer.inquiry.generate-pdf');
+    Route::get('/inquiry/{id}/generate-pdf', [App\Http\Controllers\Frontend\CustomerDashboardController::class, 'generateInquiryPDF'])->name('customer.inquiry.generate-pdf');
+    Route::get('/invoice/{id}/generate-pdf', [App\Http\Controllers\Frontend\CustomerDashboardController::class, 'generateInvoicePDF'])->name('customer.invoice.generate-pdf');
 });
 
 // Legacy User Routes (keeping for backward compatibility)
@@ -195,6 +196,18 @@ Route::prefix('/admin')->middleware(['auth:web', 'role:admin'])->group(function 
         Route::post('/update-status', [App\Http\Controllers\Admin\InquiryController::class, 'updateStatus'])->name('admin.inquiry.updateStatus');
         Route::get('/{id}/generate-pdf', [App\Http\Controllers\Admin\InquiryController::class, 'generatePDF'])->name('admin.inquiry.generatePDF');
         Route::get('/{id}/generate-invoice', [App\Http\Controllers\Admin\InquiryController::class, 'generateInvoice'])->name('admin.inquiry.generateInvoice');
+        Route::post('/{id}/create-invoice', [App\Http\Controllers\Admin\InquiryController::class, 'createInvoice'])->name('admin.inquiry.createInvoice');
+    });
+    Route::group(['prefix' => 'invoice'], function(){
+        Route::get('/', [App\Http\Controllers\Admin\InvoiceController::class, 'index'])->name('admin.invoice.index');
+        Route::get('/create', [App\Http\Controllers\Admin\InvoiceController::class, 'create'])->name('admin.invoice.create');
+        Route::post('/store', [App\Http\Controllers\Admin\InvoiceController::class, 'store'])->name('admin.invoice.store');
+        Route::get('/{inquiry_id}/edit', [App\Http\Controllers\Admin\InvoiceController::class, 'edit'])->name('admin.invoice.edit');
+        Route::get('/{id}/generate-pdf', [App\Http\Controllers\Admin\InvoiceController::class, 'generatePDF'])->name('admin.invoice.generatePDF');
+        Route::post('/billing/store', [App\Http\Controllers\Admin\InvoiceController::class, 'storeBilling'])->name('admin.invoice.billing.store');
+        Route::put('/billing/verify/{invoice_id}', [App\Http\Controllers\Admin\InvoiceController::class, 'verifyBilling'])->name('admin.invoice.billing.verify');
+        Route::put('/billing/{id}', [App\Http\Controllers\Admin\InvoiceController::class, 'updateBilling'])->name('admin.invoice.billing.update');
+        Route::delete('/billing/{id}', [App\Http\Controllers\Admin\InvoiceController::class, 'deleteBilling'])->name('admin.invoice.billing.delete');
     });
     Route::group(['prefix' => 'shipping'], function(){
         Route::get('/', [App\Http\Controllers\Admin\ShippingController::class, 'index'])->name('admin.shipping.index');
@@ -246,4 +259,6 @@ Route::post('/update-password/{id}', [App\Http\Controllers\HomeController::class
 
 //Language Translation
 Route::get('index/{locale}', [App\Http\Controllers\HomeController::class, 'lang']);
+
+
 

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Customer;
 use App\Models\Inquiry;
+use App\Models\Invoice;
 use App\Models\Port;
 use PDF;
 
@@ -22,10 +23,9 @@ class CustomerDashboardController extends Controller
         $customer = Auth::guard('customer')->user();
         
         $inquiries = $customer->submittedInquiries()
-            ->with(['vehicle'])
+            ->with(['vehicle', 'invoice'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
-
         return view('front.pages.customer.inquiries', compact('customer', 'inquiries'));
     }
     
@@ -37,11 +37,11 @@ class CustomerDashboardController extends Controller
         $customer = Auth::guard('customer')->user();
         
         $purchases = $customer->inquiries()
-            ->whereIn('vehicle_status', ['Payment Received', 'Shipping', 'Document'])
-            ->with(['vehicle'])
+            ->whereHas('invoice')
+            ->with(['vehicle', 'invoice'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
-        
+            
         return view('front.pages.customer.purchases', compact('customer', 'purchases'));
     }
     
@@ -128,22 +128,11 @@ class CustomerDashboardController extends Controller
             ->with(['vehicle'])
             ->findOrFail($inquiryId);
         
-        // Generate mock billing history data
-        $billingHistory = [
-            [
-                'id' => 1,
-                'created_date' => $inquiry->created_at->format('M d, Y'),
-                'description' => 'Initial Payment',
-                'paid_amount' => number_format($inquiry->safe_total_price * 0.6, 0)
-            ],
-            [
-                'id' => 2,
-                'created_date' => $inquiry->created_at->addDays(1)->format('M d, Y'),
-                'description' => 'Final Payment',
-                'paid_amount' => number_format($inquiry->safe_total_price * 0.4, 0)
-            ]
-        ];
-        
+        // Get actual billing history from database
+        $billingHistory = $inquiry->invoice->billingHistory()
+            ->with(['creator', 'verifier'])
+            ->orderBy('created_at', 'asc')
+            ->get();
         // Calculate breakdown
         $breakdown = [
             'fob_price' => $inquiry->safe_fob_price ?? ($inquiry->safe_total_price * 0.7),
@@ -162,17 +151,40 @@ class CustomerDashboardController extends Controller
     /**
      * Generate PDF quotation for customer
      */
-    public function generatePDF($id)
+    public function generateInquiryPDF($id)
     {
         $customer = Auth::guard('customer')->user();
         
         // Ensure customer can only access their own inquiries
-        $inquiry = $customer->inquiries()->with(['vehicle', 'user'])->findOrFail($id);
-        
+        $inquiry = $customer->inquiries()->with(['vehicle', 'user', 'salesAgent', 'inquiryCountry'])->findOrFail($id);
         $pdf = PDF::loadView('admin.pages.inquiry.pdf', compact('inquiry'));
         
         return $pdf->stream('quotation-' . $inquiry->id . '.pdf');
     }
+
+    public function generateInvoicePDF($id)
+    {
+        $invoice = Invoice::with([
+            'inquiry.vehicle.vehicleImages',
+            'inquiry.customer',
+            'inquiry.user',
+            'inquiry.salesAgent',
+            'billingHistory',
+            'billingHistory.creator',
+            'billingHistory.verifier',
+            'creator',
+            'verifier'
+        ])->findOrFail($id);
+            
+        $pdf = \PDF::loadView('admin.pages.invoice.pdf', compact('invoice'));
+
+        $filename = 'Invoice_' . ($invoice->invoice_number ?? 'SM-' . $invoice->id) . '.pdf';
+
+        return $pdf->stream($filename);
+    }
 }
+
+
+
 
 

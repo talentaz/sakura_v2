@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Inquiry;
+use App\Models\Invoice;
 use App\Models\Vehicle;
 use App\Models\User;
 use Carbon\Carbon;
@@ -17,12 +18,15 @@ class InquiryController extends Controller
      */
     public function index(Request $request)
     {
-        $inquiries = Inquiry::with(['vehicle', 'user'])
+        $perPage = $request->get('per_page', 10); // Default to 10 entries
+
+        $inquiries = Inquiry::with(['vehicle', 'user', 'invoice'])
             ->orderBy('id', 'desc')
-            ->get();
-       
+            ->paginate($perPage);
+
         return view('admin.pages.inquiry.index', [
             'inquiries' => $inquiries,
+            'perPage' => $perPage,
         ]);
     }
 
@@ -76,14 +80,29 @@ class InquiryController extends Controller
      */
     public function edit($id)
     {
-        $inquiry = Inquiry::findOrFail($id);
+        $inquiry = Inquiry::with([
+            'vehicle' => function($query) {
+                $query->with(['vehicleImages' => function($imageQuery) {
+                    $imageQuery->orderByRaw('CONVERT(image, SIGNED) ASC')->limit(1);
+                }]);
+            },
+            'user',
+            'salesAgent',
+            'inquiryCountry',
+            'invoice'
+        ])->findOrFail($id);
+        
         $users = User::with('role')
             ->where('id', '!=', auth()->id())
             ->orderBy('id', 'DESC')
             ->get();
+        
+        $vehicle_status = config('config.vehicle_status');
+        
         return view('admin.pages.inquiry.edit', [
             'inquiry' => $inquiry,
             'users' => $users,
+            'vehicle_status' => $vehicle_status,
         ]);
     }
 
@@ -94,7 +113,6 @@ class InquiryController extends Controller
     {
         $inquiry = Inquiry::findOrFail($id);
         $updateType = $request->input('update_type');
-
         switch ($updateType) {
             case 'sales_agent':
                 $request->validate([
@@ -105,9 +123,10 @@ class InquiryController extends Controller
                 break;
 
             case 'vehicle_status':
-                $request->validate([
-                    'vehicle_status' => 'required|in:Reserved,Ready to Ship,Open,Inactive',
-                ]);
+                
+                // $request->validate([
+                //     'vehicle_status' => 'required|in:Open, Reserved, Prepare for Shipment, Ready to Ship, Completed, Inactive',
+                // ]);
                 $inquiry->vehicle_status = $request->vehicle_status;
 
                 // Clear expiry date if status is not Reserved
@@ -119,11 +138,25 @@ class InquiryController extends Controller
                 break;
 
             case 'reserved_expiry_date':
+                // dd(2);
                 $request->validate([
-                    'reserved_expiry_date' => 'nullable|date',
+                    'reserved_expiry_date' => 'required|date',
                 ]);
+                
+                // When updating expiry date, ensure status is Reserved
+                $inquiry->vehicle_status = 'Reserved';
                 $inquiry->reserved_expiry_date = $request->reserved_expiry_date;
-                $message = 'Reserved expiry date updated successfully!';
+                $message = 'Vehicle status set to Reserved and expiry date updated successfully!';
+                break;
+
+            case 'total_discount':
+                $request->validate([
+                    'total_price' => 'required|numeric|min:0',
+                    'discount' => 'nullable|numeric|min:0',
+                ]);
+                $inquiry->total_price = $request->total_price;
+                $inquiry->discount = $request->discount;
+                $message = 'Total price and discount updated successfully!';
                 break;
 
             default:
@@ -194,11 +227,10 @@ class InquiryController extends Controller
     public function generatePDF($id)
     {
         $inquiry = Inquiry::with(['vehicle', 'user'])->findOrFail($id);
-
+        
         $pdf = PDF::loadView('admin.pages.inquiry.pdf', compact('inquiry'));
 
         return $pdf->stream('quotation-' . $inquiry->id . '.pdf');
-        // return $pdf->download('quotation-' . $inquiry->id . '.pdf');
     }
 
     /**
@@ -211,6 +243,29 @@ class InquiryController extends Controller
         return view('admin.pages.inquiry.invoice', [
             'inquiry' => $inquiry,
         ]);
+    }
+
+    /**
+     * Create invoice for inquiry
+     */
+    public function createInvoice($id)
+    {
+        $inquiry = Inquiry::findOrFail($id);
+
+        // Check if invoice already exists
+        if ($inquiry->invoice) {
+            return redirect()->back()->with('error', 'Invoice already exists for this inquiry.');
+        }
+
+        // Create invoice with inquiry data
+        $invoice = Invoice::create([
+            'inquiry_id' => $inquiry->id,
+            'paid_amount' => $inquiry->total_price ?? 0,
+            // 'description' => 'Invoice for ' . $inquiry->vehicle_name,
+            'created_by' => auth()->id(),
+        ]);
+
+        return redirect()->back()->with('success', 'Invoice created successfully.');
     }
 
     /**
@@ -229,3 +284,7 @@ class InquiryController extends Controller
     }
 
 }
+
+
+
+

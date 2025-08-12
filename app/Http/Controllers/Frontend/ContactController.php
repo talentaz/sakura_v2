@@ -63,6 +63,7 @@ class ContactController extends Controller
         $totalPrice = $this->cleanPrice($request->get('total_price'));
         $inspection = $this->cleanPrice($request->get('inspection'));
         $insurance = $this->cleanPrice($request->get('insurance'));
+        $freightFee = $this->cleanPrice($request->get('freight_fee'));
 
         $emails = ['rajika@sakuramotors.com', 'nalaka@sakuramotors.com'];
 
@@ -110,6 +111,7 @@ class ContactController extends Controller
         $inquery->inqu_comment = $request->get('inqu_comment');
         $inquery->stock_no = $request->get('stock_no');
         $inquery->vehicle_id = $request->get('vehicle_id');
+        $inquery->freight_fee = $freightFee;
 
         // Add customer_id if customer is logged in
         if (Auth::guard('customer')->check()) {
@@ -140,7 +142,7 @@ class ContactController extends Controller
         //     Notification::send($admins, new NewUserNotification($comments));
         // }
 
-        // $inquery->save();
+        $inquery->save();
 
         // Generate PDF and send email to customer
         try {
@@ -172,11 +174,11 @@ class ContactController extends Controller
             // Log the error but don't fail the inquiry submission
             \Log::error('PDF generation or email sending failed: ' . $e->getMessage());
         }
-
+        
    
         return response()->json([
             'success' => true,
-            'message' => '123 asd Thank you for your inquiry! We have sent you a quotation via email.',
+            'message' => 'Thank you for your inquiry! We have sent you a quotation via email.',
             'redirect_url' => route('front.customer.login')
         ]);
 
@@ -230,6 +232,7 @@ class ContactController extends Controller
         return is_numeric($cleaned) ? (float)$cleaned : null;
     }
 }
+
 
 
 

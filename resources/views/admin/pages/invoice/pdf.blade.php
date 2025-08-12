@@ -132,7 +132,7 @@
                         <img src="{{ public_path('assets/frontend/assets/logo.png') }}" alt="Sakura Motors" />
                     </td>
                     <td>
-                        <h1>Quotation</h1>
+                        <h1>Proforma Invoice</h1>
                         <div class="contact-info">
                             305-0818, 3-48-48, Gakuen Minami, Tsukuba Shi, Ibaraki Ken, Japan. <br>
                             Tel: +81-29-819-0850 | Fax: +81-29-868-3669 | Email: info@sakuramotors.com
@@ -146,33 +146,33 @@
             <table class="invoice-details">
                 <tr>
                     <td style="border: unset">
-                        <div class="section-title">Inquiry Details</div>
+                        <div class="section-title">Invoice Details</div>
                         <table class="invoice-details">
                             <tr>
-                                <td class="label">Stock No:</td>
-                                <td>{{ $inquiry->stock_no ?? 'N/A' }}</td>
+                                <td class="label">Invocie No:</td>
+                                <td>SM-{{ $invoice->inquiry->stock_no ?? 'N/A' }}</td>
                             </tr>
                             <tr>
-                                <td class="label">Inquiry Date:</td>
-                                <td>{{ $inquiry->created_at ? $inquiry->created_at->format('M d, Y') : 'N/A' }}</td>
+                                <td class="label">Issued Date:</td>
+                                <td>{{ $invoice->inquirycreated_at ? $invoice->created_at->format('M d, Y') : 'N/A' }}</td>
                             </tr>
                             <tr>
-                                <td class="label">Quotation ID:</td>
-                                <td>SM-{{ $inquiry->id ?? 'N/A' }}</td>
+                                <td class="label">Due Date:</td>
+                                <td>{{ $invoice->inquiry->reserved_expiry_date ? $invoice->inquiry->reserved_expiry_date->format('M d, Y') : 'N/A' }}</td>
                             </tr>
                             <tr>
                                 <td class="label">Sales Agent Email:</td>
-                                <td>{{ $inquiry->salesAgent && $inquiry->salesAgent->email ? $inquiry->salesAgent->email : 'N/A' }}</td>
+                                <td>{{ $invoice->inquiry->salesAgent && $invoice->inquiry->salesAgent->email ? $invoice->inquiry->salesAgent->email : 'N/A' }}</td>
                             </tr>
                             <tr>
                                 <td class="label">Sales Agent Contact:</td>
-                                <td>{{ $inquiry->salesAgent && $inquiry->salesAgent->phone ? $inquiry->salesAgent->phone : 'N/A' }}</td>
+                                <td>{{ $invoice->inquiry->salesAgent && $invoice->inquiry->salesAgent->phone ? $invoice->inquiry->salesAgent->phone : 'N/A' }}</td>
                             </tr>
                             <tr>
                                 <td class="label">Customer Message:</td>
                                 <td>
-                                    @if ($inquiry->inqu_comment)
-                                        <span style="font-style: italic">"{{ $inquiry->inqu_comment }}"</span>
+                                    @if ($invoice->inquiry->inqu_comment)
+                                        <span style="font-style: italic">"{{ $invoice->inquiry->inqu_comment }}"</span>
                                     @else
                                         N/A
                                     @endif
@@ -192,27 +192,27 @@
                         <table class="invoice-details">
                             <tr>
                                 <td class="label">Customer Name:</td>
-                                <td>{{ $inquiry->inqu_name ?? 'N/A' }}</td>
+                                <td>{{ $invoice->inquiry->inqu_name ?? 'N/A' }}</td>
                             </tr>
                             <tr>
                                 <td class="label">Email Address:</td>
-                                <td>{{ $inquiry->inqu_email ?? 'N/A' }}</td>
+                                <td>{{ $invoice->inquiry->inqu_email ?? 'N/A' }}</td>
                             </tr>
                             <tr>
                                 <td class="label">Mobile Number:</td>
-                                <td>{{ $inquiry->inqu_mobile ?? 'N/A' }}</td>
+                                <td>{{ $invoice->inquiry->inqu_mobile ?? 'N/A' }}</td>
                             </tr>
                             <tr>
                                 <td class="label">Address:</td>
-                                <td>{{ $inquiry->inqu_address ?? 'N/A' }}</td>
+                                <td>{{ $invoice->inquiry->inqu_address ?? 'N/A' }}</td>
                             </tr>
                             <tr>
                                 <td class="label">City:</td>
-                                <td>{{ $inquiry->inqu_city ?? 'N/A' }}</td>
+                                <td>{{ $invoice->inquiry->inqu_city ?? 'N/A' }}</td>
                             </tr>
                             <tr>
                                 <td class="label">Country:</td>
-                                <td>{{ $inquiry->inqu_country && $inquiry->inquiryCountry->country ? $inquiry->inquiryCountry->country: 'N/A' }}</td>
+                                <td>{{ $invoice->inquiry->inqu_country && $invoice->inquiry->inquiryCountry->country ? $invoice->inquiry->inquiryCountry->country: 'N/A' }}</td>
                             </tr>
                         </table>
                     </td>
@@ -221,27 +221,27 @@
                         <table class="invoice-details">
                             <tr>
                                 <td class="label">Customer Name:</td>
-                                <td>{{ $inquiry->inqu_name ?? 'N/A' }}</td>
+                                <td>{{ $invoice->inquiry->inqu_name ?? 'N/A' }}</td>
                             </tr>
                             <tr>
                                 <td class="label">Email Address:</td>
-                                <td>{{ $inquiry->inqu_email ?? 'N/A' }}</td>
+                                <td>{{ $invoice->inquiry->inqu_email ?? 'N/A' }}</td>
                             </tr>
                             <tr>
                                 <td class="label">Mobile Number:</td>
-                                <td>{{ $inquiry->inqu_mobile ?? 'N/A' }}</td>
+                                <td>{{ $invoice->inquiry->inqu_mobile ?? 'N/A' }}</td>
                             </tr>
                             <tr>
                                 <td class="label">Address:</td>
-                                <td>{{ $inquiry->inqu_address ?? 'N/A' }}</td>
+                                <td>{{ $invoice->inquiry->inqu_address ?? 'N/A' }}</td>
                             </tr>
                             <tr>
                                 <td class="label">City:</td>
-                                <td>{{ $inquiry->inqu_city ?? 'N/A' }}</td>
+                                <td>{{ $invoice->inquiry->inqu_city ?? 'N/A' }}</td>
                             </tr>
                             <tr>
                                 <td class="label">Country:</td>
-                                <td>{{ $inquiry->inqu_country && $inquiry->inquiryCountry->country ? $inquiry->inquiryCountry->country: 'N/A' }}</td>
+                                <td>{{ $invoice->inquiry->inqu_country && $invoice->inquiry->inquiryCountry->country ? $invoice->inquiry->inquiryCountry->country: 'N/A' }}</td>
                             </tr>
                         </table>
                     </td>
@@ -250,23 +250,23 @@
                         <table class="invoice-details">
                             <tr>
                                 <td class="label">Final Country:</td>
-                                <td>{{ $inquiry->inqu_country && $inquiry->inquiryCountry->country ? $inquiry->inquiryCountry->country: 'N/A' }}</td>
+                                <td>{{ $invoice->inquiry->inqu_country && $invoice->inquiry->inquiryCountry->country ? $invoice->inquiry->inquiryCountry->country: 'N/A' }}</td>
                             </tr>
                             <tr>
                                 <td class="label">Port Name:</td>
-                                <td>{{ $inquiry->inqu_port ?? 'N/A' }}</td>
+                                <td>{{ $invoice->inquiry->inqu_port ?? 'N/A' }}</td>
                             </tr>
                             <tr>
                                 <td class="label">Type of Purchase:</td>
-                                <td>{{ $inquiry->total_price && $inquiry->total_price !== 'ASK' ? 'CIF' : 'FOB' }}</td>
+                                <td>{{ $invoice->inquiry->total_price && $invoice->inquiry->total_price !== 'ASK' ? 'CIF' : 'FOB' }}</td>
                             </tr>
                             <tr>
                                 <td class="label">Insurance:</td>
-                                <td>{{ $inquiry->insurance && $inquiry->insurance !== '0' ? 'Yes' : 'No' }}</td>
+                                <td>{{ $invoice->inquiry->insurance && $invoice->inquiry->insurance !== '0' ? 'Yes' : 'No' }}</td>
                             </tr>
                             <tr>
                                 <td class="label">Inspection:</td>
-                                <td>{{ $inquiry->inspection && $inquiry->inspection !== '0' ? 'Yes' : 'No' }}</td>
+                                <td>{{ $invoice->inquiry->inspection && $invoice->inquiry->inspection !== '0' ? 'Yes' : 'No' }}</td>
                             </tr>
                         </table>
                     </td>
@@ -288,22 +288,22 @@
                 <tbody>
                     <tr>
                         <td style="vertical-align: top;">
-                            {{ $inquiry->vehicle_name ?? 'N/A' }}
-                            @if($inquiry->vehicle)
+                            {{ $invoice->inquiry->vehicle_name ?? 'N/A' }}
+                            @if($invoice->inquiry->vehicle)
                             <div class="specs">
-                                Stock No: {{ $inquiry->stock_no ?? 'N/A' }} <br>
-                                Make: {{ $inquiry->vehicle->make_type ?? 'N/A' }} <br>
-                                Model: {{ $inquiry->vehicle->model_type ?? 'N/A' }} <br>
-                                Year: {{ $inquiry->vehicle->registration ?? 'N/A' }} <br>
-                                Engine Size: {{ $inquiry->vehicle->engine_size ?? 'N/A' }} <br>
-                                Transmission: {{ $inquiry->vehicle->transmission ?? 'N/A' }} <br>
-                                Fuel: {{ $inquiry->vehicle->fuel_type ?? 'N/A' }} <br>
+                                Stock No: {{ $invoice->inquiry->stock_no ?? 'N/A' }} <br>
+                                Make: {{ $invoice->inquiry->vehicle->make_type ?? 'N/A' }} <br>
+                                Model: {{ $invoice->inquiry->vehicle->model_type ?? 'N/A' }} <br>
+                                Year: {{ $invoice->inquiry->vehicle->registration ?? 'N/A' }} <br>
+                                Engine Size: {{ $invoice->inquiry->vehicle->engine_size ?? 'N/A' }} <br>
+                                Transmission: {{ $invoice->inquiry->vehicle->transmission ?? 'N/A' }} <br>
+                                Fuel: {{ $invoice->inquiry->vehicle->fuel_type ?? 'N/A' }} <br>
                             </div>
                             @endif
                         </td>
-                        <td style="vertical-align: top;text-align: right">{{ $inquiry->fob_price ?? 'ASK' }}</td>
+                        <td style="vertical-align: top;text-align: right">{{ $invoice->inquiry->fob_price ?? 'ASK' }}</td>
                         <td style="vertical-align: top;text-align: right">1</td>
-                        <td style="vertical-align: top;text-align: right">{{ $inquiry->fob_price ?? 'ASK' }}</td>
+                        <td style="vertical-align: top;text-align: right">{{ $invoice->inquiry->fob_price ?? 'ASK' }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -320,35 +320,129 @@
                                     <td colspan="3" style="text-align: right; font-weight: bold">
                                         FOB Price
                                     </td>
-                                    <td style="text-align: right">{{ $inquiry->fob_price ?? 'ASK' }}</td>
+                                    <td style="text-align: right">${{ number_format($invoice->inquiry->fob_price) ?? 'ASK' }}</td>
                                 </tr>
                                 <tr>
                                     <td colspan="3" style="text-align: right; font-weight: bold">
                                         Freight Fee
                                     </td>
-                                    <td style="text-align: right">{{ $inquiry->freight_fee ?? '0' }}</td>
+                                    <td style="text-align: right">${{ number_format($invoice->inquiry->freight_fee) ?? '0' }}</td>
                                 </tr>
                                 <tr>
                                     <td colspan="3" style="text-align: right; font-weight: bold">
                                         Insurance Fee
                                     </td>
-                                    <td style="text-align: right">{{ $inquiry->insurance ?? '0' }}</td>
+                                    <td style="text-align: right">${{ number_format($invoice->inquiry->insurance) ?? '0' }}</td>
                                 </tr>
                                 <tr>
                                     <td colspan="3" style="text-align: right; font-weight: bold">
                                         Inspection Fee
                                     </td>
-                                    <td style="text-align: right">{{ $inquiry->inspection ?? '0' }}</td>
+                                    <td style="text-align: right">${{ $invoice->inquiry->inspection ?? '0' }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" style="text-align: right; font-weight: bold">
+                                        Discount
+                                    </td>
+                                    <td style="text-align: right">(${{ number_format($invoice->inquiry->discount) ?? '0' }})</td>
                                 </tr>
                                 <tr>
                                     <td colspan="3" style="text-align: right; font-weight: bold" class="total">
                                         Total Amount
                                     </td>
                                     <td style="text-align: right; font-weight: bold" class="total">
-                                        {{ $inquiry->total_price ?? 'ASK' }}
+                                        ${{ number_format($invoice->inquiry->total_price) ?? 'ASK' }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" style="text-align: right; font-weight: bold">
+                                        Amount Paid
+                                    </td>
+                                    <td style="text-align: right; font-weight: bold ">${{ number_format($invoice->total_paid ?? 0) }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" style="text-align: right; font-weight: bold" class="total">
+                                        Amount Due
+                                    </td>
+                                    <td style="text-align: right; font-weight: bold" class="total">
+                                        ${{ number_format($invoice->total_paid) ? number_format($invoice->inquiry->total_price - $invoice->total_paid) : '0' }}
                                     </td>
                                 </tr>
                             </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div style="page-break-after: always;"></div>
+
+        @if ($invoice->billingHistory->count() > 0)
+            <div class="invoice-section" style="padding: 10px">
+                <div class="section-title">Billing History</div>
+                <table class="invoice-items">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left">#</th>
+                            <th style="text-align: left">Created Date</th>
+                            <th style="text-align: left">Description</th>
+                            <th style="text-align: right">Amount Paid</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($invoice->billingHistory as $key => $billing)
+                            <tr>
+                                <td style="text-align: left">{{ $key + 1 }}.</td>
+                                <td style="text-align: left">{{ $billing->created_at->format('M d, Y') }}</td>
+                                <td style="text-align: left; white-space: normal;">{{ $billing->description ?? 'N/A' }}</td>
+                                <td style="vertical-align: top;text-align: right">${{ number_format($billing->paid_amount, 2) }}</td>
+                            </tr>
+                        @endforeach
+
+                        <tr>
+                            <td colspan="2" class="total"></td>
+                            <td style="vertical-align: top;text-align: right;font-weight: bold" class="total">
+                                Total Amount Paid
+                                @if (number_format($invoice->inquiry->total_price - $invoice->total_paid) == 0)
+                                    (Verified)
+                                @endif
+                            </td>
+                            <td style="vertical-align: top;text-align: right;font-weight: bold" class="total">{{ number_format($invoice->total_paid) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        @endif
+
+        <div class="invoice-section">
+            <table class="invoice-details">
+                <tr>
+                    <td>
+                        <div class="section-title">Bank Account & Beneficiary Details</div>
+                        <table class="invoice-details">
+                            <tr>
+                                <td class="label">Account Name:</td>
+                                <td>{{ config('app.account_name', 'SAKURA MOTORS CO.,LTD') }}</td>
+                            </tr>
+                            <tr>
+                                <td class="label">Bank Name:</td>
+                                <td>{{ config('app.bank_name', 'SUMITOMO MITSUI BANKING CORPORATION') }}</td>
+                            </tr>
+                            <tr>
+                                <td class="label">Branch Name:</td>
+                                <td>{{ config('app.branch_name', 'TSUKUBA BRANCH') }}</td>
+                            </tr>
+                            <tr>
+                                <td class="label">Branch Address:</td>
+                                <td>{{ config('app.branch_address', '5-19, KENKYUGAKUEN, TSUKUBA-SHI, IBARAKI ,305-0817, JAPAN') }}</td>
+                            </tr>
+                            <tr>
+                                <td class="label">Swift Code:</td>
+                                <td>{{ config('app.swift_code', 'SMBCJPJT') }}</td>
+                            </tr>
+                            <tr>
+                                <td class="label">Account Number:</td>
+                                <td>{{ config('app.account_number', '244-0488651') }}</td>
+                            </tr>
                         </table>
                     </td>
                 </tr>

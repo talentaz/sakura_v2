@@ -360,6 +360,9 @@ return [
     ],
     'order_status' =>[
         'Inquiry', 'Invoice Issued', 'Payment Received', 'Shipping', 'Document'
-    ],  
+    ],
+    'vehicle_status' => [
+        'Open', 'Reserved', 'Prepare for Shipment' , 'Ready to Ship', 'Completed', 'Inactive'
+    ],
 ];
 // 

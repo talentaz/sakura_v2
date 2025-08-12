@@ -20,13 +20,10 @@
     padding: 20px;
 }
 
-/* Billing Page Specific */
+/* Billing Page Styles */
 .billing-header {
     padding: 20px;
     border-bottom: 1px solid #dee2e6;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
     background: #f8f9fa;
     border-radius: 8px 8px 0 0;
 }
@@ -39,7 +36,71 @@
 }
 
 .billing-content {
+    padding: 30px;
+    background: white;
+}
+
+.billing-table {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.billing-table thead th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+    color: #495057;
+    padding: 15px;
+}
+
+.billing-table tbody td {
+    padding: 15px;
+    border-bottom: 1px solid #f1f1f1;
+    color: #6c757d;
+}
+
+.billing-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.payment-summary {
+    /* background: #f8f9fa; */
     padding: 20px;
+    border-radius: 8px;
+    /* border: 1px solid #dee2e6; */
+    width: 33.33%;
+    margin-left: 66.66%;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    color: #6c757d;
+}
+
+.summary-row hr {
+    margin: 10px 0;
+    border-color: #dee2e6;
+}
+
+.total-row {
+    /* border-top: 1px solid #dee2e6; */
+    padding-top: 15px;
+    margin-top: 10px;
+    color: #495057;
+}
+
+.paid-row {
+    color: #28a745;
+}
+
+.due-row {
+    border-top: 2px solid #dee2e6;
+    padding-top: 15px;
+    margin-top: 10px;
 }
 
 /* Enhanced Data Tables - Modern Design */
@@ -254,6 +315,7 @@
 .pagination {
     margin: 0;
     justify-content: center;
+    display: flex;
 }
 
 .page-link {
@@ -331,7 +393,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 8px 0;
-    border-bottom: 1px solid #dee2e6;
+    /* border-bottom: 1px solid #dee2e6; */
 }
 
 .summary-row:last-child {
@@ -352,6 +414,10 @@
 
 /* Responsive Tables */
 @media (max-width: 768px) {
+    .payment-summary {
+        width: 100%;
+        margin: 0;
+    }
     .table-responsive {
         font-size: 12px;
     }

@@ -901,10 +901,7 @@ function calculateFinalPrice() {
         }
 
         const shippingPrice = portPrice * cubicMeter;
-        console.log("portPrice", portPrice);
-        console.log("cubicMeter", cubicMeter);
-        console.log("shippingPrice", shippingPrice);
-        console.log("vehiclePrice", vehiclePrice);
+
         const finalPrice = Math.round(
             vehiclePrice + shippingPrice + inspectionPrice + insurancePrice
         );
@@ -949,10 +946,14 @@ function updateInquiryForm(
     inspectionPrice,
     insurancePrice
 ) {
+    const shippingPrice =
+        portPrice * parseFloat($(".cubic-meter-hidden").val() || 0);
+
     $(".inqu_fob_price").val($(".vehicle-price-hidden").val());
     $(".inqu_inspection").val(inspectionPrice);
     $(".inqu_insurance").val(insurancePrice);
     $(".inqu_port").val(portPrice);
+    $(".inqu_freight_fee").val(shippingPrice);
     $(".inqu_total_price").val("$" + finalPrice.toLocaleString());
     $(".inqu_url").val(window.location.href);
 }
@@ -981,3 +982,138 @@ $("button.vs-search-btn")
             );
         }
     });
+
+$("#contactForm").submit(function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    // Trigger price calculation to ensure we have the latest values
+    if (typeof calculateFinalPrice === "function") {
+        calculateFinalPrice();
+    } else {
+        calculatePriceFallback();
+    }
+
+    // Get calculated values
+    var fobPrice = $(".vehicle-price-hidden").val() || "";
+    var inspectionValue = $(".insp-value").val() || "0";
+    var insuranceValue = $(".insu-value").val() || "0";
+    var portValue = $(".cif p").text() || "";
+    var totalPrice = $(".total-price-value").text() || "ASK";
+    var stockNo = $(".stock_no").val();
+
+    // Clean up the total price - remove $ and commas for database storage
+    var cleanTotalPrice = totalPrice;
+    if (totalPrice !== "ASK") {
+        cleanTotalPrice = totalPrice.replace(/[$,]/g, "").trim();
+    }
+
+    // Update hidden form fields
+    $(".inqu_fob_price").val(fobPrice);
+    $(".inqu_inspection").val(inspectionValue);
+    $(".inqu_insurance").val(insuranceValue);
+    $(".inqu_port").val(portValue);
+    $(".inqu_url").val(window.location.href);
+    $(".inqu_total_price").val(cleanTotalPrice);
+    $(".stock_no").val(stockNo);
+
+    // Validate required fields
+    var name = $('input[name="inqu_name"]').val().trim();
+    var email = $('input[name="inqu_email"]').val().trim();
+    var mobile = $('input[name="inqu_mobile"]').val().trim();
+    var country = $('select[name="inqu_country"]').val();
+
+    if (!name) {
+        toastr["error"]("Please enter your name");
+        $('input[name="inqu_name"]').focus();
+        return;
+    }
+
+    if (!email) {
+        toastr["error"]("Please enter your email");
+        $('input[name="inqu_email"]').focus();
+        return;
+    }
+
+    // Basic email validation
+    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        toastr["error"]("Please enter a valid email address");
+        $('input[name="inqu_email"]').focus();
+        return;
+    }
+
+    if (!mobile) {
+        toastr["error"]("Please enter your mobile number");
+        $('input[name="inqu_mobile"]').focus();
+        return;
+    }
+
+    if (!country) {
+        toastr["error"]("Please select your country");
+        $('select[name="inqu_country"]').focus();
+        return;
+    }
+
+    var formData = new FormData($("#contactForm")[0]);
+    $.ajaxSetup({
+        headers: {
+            "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
+        },
+    });
+    $.ajax({
+        url: inquiry_url, // This should point to the correct route
+        method: "post",
+        data: formData,
+        success: function (res) {
+            if (res.success) {
+                toastr["success"](res.message);
+                $("#contactForm")[0].reset();
+
+                // Redirect to login page after 2 seconds
+                setTimeout(function () {
+                    window.location.href = res.redirect_url || login_url;
+                }, 2000);
+            }
+        },
+        error: function (res) {
+            console.log(res);
+            toastr["error"]("An error occurred. Please try again.");
+        },
+        cache: false,
+        contentType: false,
+        processData: false,
+    });
+});
+
+function calculatePriceFallback() {
+    try {
+        var vehiclePrice = parseInt($(".vehicle-price-hidden").val()) || 0;
+        var inspectionPrice = parseInt($(".insp-value").val()) || 0;
+        var insurancePrice = parseInt($(".insu-value").val()) || 0;
+
+        // If no port is selected, show ASK
+        var portValue = $("#salaamSelect").val() || $("#makeSelect").val();
+        if (!portValue || portValue === "0") {
+            $(".total-price-value").text("ASK");
+            $(".stock-price-info h1:last-child").text("ASK");
+            return;
+        }
+
+        // Basic calculation without shipping (if port data is not available)
+        var totalPrice = vehiclePrice + inspectionPrice + insurancePrice;
+        var formattedPrice = "$" + totalPrice.toLocaleString();
+
+        $(".total-price-value").text(formattedPrice);
+        $(".stock-price-info h1:last-child").text(formattedPrice);
+
+        // Update inquiry form fields
+        $(".inqu_fob_price").val(vehiclePrice);
+        $(".inqu_inspection").val(inspectionPrice);
+        $(".inqu_insurance").val(insurancePrice);
+        $(".inqu_total_price").val(formattedPrice);
+    } catch (error) {
+        console.error("Error in fallback price calculation:", error);
+        $(".total-price-value").text("ASK");
+        $(".stock-price-info h1:last-child").text("ASK");
+    }
+}
