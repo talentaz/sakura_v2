@@ -4,33 +4,39 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use App\Helpers\RoleHelper;
 
 class RoleMiddleware
 {
     public function handle(Request $request, Closure $next, ...$roles)
     {
+        // Trim whitespace from role names
+        $roles = array_map('trim', $roles);
+
         if (!auth()->check()) {
             return redirect('/login');
         }
 
         $user = auth()->user();
+
         if (!$user->role) {
             return redirect('/')->with('error', "No role assigned.");
         }
 
-        // Get the role relationship
-        $roleModel = $user->role;
-        
-        if (!$roleModel) {
-            return redirect('/')->with('error', "Role not found.");
-        }
+        $userRoleSlug = $user->role->slug;
 
-        $userRoleSlug = $roleModel->slug;
-
+        // Check if user's role is in the allowed roles for this route
         if (in_array($userRoleSlug, $roles)) {
-            return $next($request);
+            // Additional check: verify if the specific route is allowed for this role
+            $currentRouteName = $request->route()->getName();
+
+            if (RoleHelper::canAccessRoute($userRoleSlug, $currentRouteName)) {
+                return $next($request);
+            }
         }
 
-        return redirect('/')->with('error', "You don't have permission to access this area.");
+        // Redirect to user's default page instead of home
+        $redirectUrl = RoleHelper::getUnauthorizedRedirectUrl($user);
+        return redirect($redirectUrl)->with('error', "You don't have permission to access this area.");
     }
 }

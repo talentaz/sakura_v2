@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
+use App\Helpers\RoleHelper;
 
 class LoginController extends Controller
 {
@@ -37,4 +39,29 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
     }
+
+    /**
+     * The user has been authenticated.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $user
+     * @return mixed
+     */
+    protected function authenticated(Request $request, $user)
+    {
+        // Use role-based redirect system
+        if ($user->role) {
+            $defaultRoute = RoleHelper::getDefaultUrl($user->role->slug);
+            try {
+                return redirect()->route($defaultRoute);
+            } catch (\Exception $e) {
+                // If route doesn't exist, fall back to default
+                return redirect()->intended($this->redirectPath());
+            }
+        }
+
+        // Default redirect for users without roles
+        return redirect()->intended($this->redirectPath());
+    }
 }
+
