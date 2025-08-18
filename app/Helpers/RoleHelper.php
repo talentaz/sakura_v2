@@ -21,7 +21,7 @@ class RoleHelper
     public static function canAccessRoute($roleSlug, $routeName)
     {
         $permissions = config('role_permissions.' . $roleSlug);
-        
+
         if (!$permissions) {
             return false;
         }

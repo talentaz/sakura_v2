@@ -104,16 +104,20 @@ Route::prefix('/admin')->middleware(['auth:web', 'role:admin,sales_manager,sales
             Route::get('/', [App\Http\Controllers\Admin\NotificationController::class, 'index'])->name('admin.notification');
             Route::get('/mark', [App\Http\Controllers\Admin\NotificationController::class, 'markNotification'])->name('admin.markNotification');
         });
+
+        // User management routes - admin only
         Route::group(['prefix' => 'user'], function(){
-            Route::get('/', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('admin.user');
-            Route::get('/create', [App\Http\Controllers\Admin\UserController::class, 'create'])->name('admin.user.create');
-            Route::post('/create', [App\Http\Controllers\Admin\UserController::class, 'store'])->name('admin.user.store');
-            Route::get('/{id}/edit', [App\Http\Controllers\Admin\UserController::class, 'edit'])->name('admin.user.edit');
-            Route::post('/{id}/edit', [App\Http\Controllers\Admin\UserController::class, 'update'])->name('admin.user.update');
-            Route::get('/{id}/change_passowrd', [App\Http\Controllers\Admin\UserController::class, 'change_password'])->name('admin.user.change_password');
-            Route::post('/updatePassword', [App\Http\Controllers\Admin\UserController::class, 'updatePassword'])->name('admin.user.updatePassword');
-            Route::post('/delete', [App\Http\Controllers\Admin\UserController::class, 'delete'])->name('admin.user.delete');
+        Route::get('/', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('admin.user');
+        Route::get('/create', [App\Http\Controllers\Admin\UserController::class, 'create'])->name('admin.user.create');
+        Route::post('/create', [App\Http\Controllers\Admin\UserController::class, 'store'])->name('admin.user.store');
+        Route::get('/{id}/edit', [App\Http\Controllers\Admin\UserController::class, 'edit'])->name('admin.user.edit');
+        Route::post('/{id}/edit', [App\Http\Controllers\Admin\UserController::class, 'update'])->name('admin.user.update');
+        Route::get('/{id}/change_passowrd', [App\Http\Controllers\Admin\UserController::class, 'change_password'])->name('admin.user.change_password');
+        Route::post('/updatePassword', [App\Http\Controllers\Admin\UserController::class, 'updatePassword'])->name('admin.user.updatePassword');
+        Route::post('/delete', [App\Http\Controllers\Admin\UserController::class, 'delete'])->name('admin.user.delete');
         });
+    });
+
         Route::group(['prefix' => 'vehicle'], function(){
             Route::get('/', [App\Http\Controllers\Admin\VehicleController::class, 'index'])->name('admin.vehicle.index');
             Route::get('/get_data', [App\Http\Controllers\Admin\VehicleController::class, 'getData'])->name('admin.vehicle.get_data');
@@ -271,7 +275,6 @@ Route::prefix('/admin')->middleware(['auth:web', 'role:admin,sales_manager,sales
             Route::put('/billing/{id}', [App\Http\Controllers\Admin\InvoiceController::class, 'updateBilling'])->name('admin.invoice.billing.update');
             Route::delete('/billing/{id}', [App\Http\Controllers\Admin\InvoiceController::class, 'deleteBilling'])->name('admin.invoice.billing.delete');
         });
-    });
 });
 Route::group(['prefix' => 'notify'], function(){
     Route::get('/', [App\Http\Controllers\Frontend\NotifyController::class, 'index'])->name('auto.email');

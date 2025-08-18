@@ -24,12 +24,15 @@ class RoleMiddleware
         }
 
         $userRoleSlug = $user->role->slug;
-
         // Check if user's role is in the allowed roles for this route
         if (in_array($userRoleSlug, $roles)) {
+            // For admin users, skip the additional RoleHelper check to avoid conflicts
+            if ($userRoleSlug === 'admin') {
+                return $next($request);
+            }
+
             // Additional check: verify if the specific route is allowed for this role
             $currentRouteName = $request->route()->getName();
-
             if (RoleHelper::canAccessRoute($userRoleSlug, $currentRouteName)) {
                 return $next($request);
             }

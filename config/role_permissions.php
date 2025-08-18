@@ -51,7 +51,6 @@ return [
             'admin.invoice.*',
             'admin.edit_profile',
             'admin.update_profile',
-            'admin.reports.*',
             'logout',
         ],
         'menu_items' => [
@@ -74,28 +73,23 @@ return [
         'menu_items' => [
             'inquiry',
             'invoice',
-            'reports',
         ]
     ],
     
     'shipment_officer' => [
         'default_url' => 'admin.shipping.index',
         'allowed_routes' => [
-            'admin.shipping.*',
             'admin.inquiry.index',
             'admin.inquiry.show',
             'admin.invoice.index',
             'admin.invoice.show',
             'admin.edit_profile',
             'admin.update_profile',
-            'admin.reports.*',
             'logout',
         ],
         'menu_items' => [
-            'shipping',
             'inquiry_view',
             'invoice_view',
-            'reports',
         ]
     ],
     
@@ -105,17 +99,13 @@ return [
             'admin.vehicle.*',
             'admin.bodyType.*',
             'admin.makerType.*',
-            'admin.port.*',
             'admin.edit_profile',
             'admin.update_profile',
-            'admin.reports.*',
             'logout',
         ],
         'menu_items' => [
             'vehicle_management',
             'category',
-            'port',
-            'reports',
         ]
     ],
 ];
