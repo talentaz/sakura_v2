@@ -264,7 +264,7 @@
                         <ul>
                             @foreach ($make_type as $row)
                             <li>
-                                <a href="{{route('front.stock')}}{{'/?make_type='}}{{$row->maker_type}}"><img src="{{URL::asset ('/uploads/make_type')}}/{{ $row->image }}"/> {{$row->maker_type}} ({{$row->cnt}})</a>
+                                <a href="{{route('front.stock')}}{{'/?make_type='}}{{$row->maker_type}}"><img src="{{URL::asset ('/uploads/maker_type')}}/{{ $row->image }}"/> {{$row->maker_type}} ({{$row->cnt}})</a>
                             </li>
                             @endforeach
                         </ul>
