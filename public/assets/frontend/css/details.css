@@ -259,6 +259,7 @@ body {
     overflow: hidden;
     flex-shrink: 0;
     cursor: pointer;
+    z-index: 1;
 }
 .thumbnail-wrapper.is-video::before {
     content: "\f144"; /* Unicode for fa-circle-play */
