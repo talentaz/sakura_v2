@@ -18,11 +18,23 @@ class InvoiceController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 10); // Default to 10 entries
-        
-        $invoices = Invoice::with(['inquiry', 'inquiry.customer'])
-            ->orderBy('id', 'desc')
-            ->paginate($perPage);
-        // dd(Invoice::with(['inquiry', 'inquiry.customer', 'inquiry.vehicle'])->get())    ;
+        $user = auth()->user();
+        $userRole = $user->role->slug ?? '';
+
+        // Build query with role-based filtering
+        $query = Invoice::with(['inquiry', 'inquiry.customer']);
+
+        // Sales agents can only see invoices for their assigned inquiries
+        if ($userRole === 'sales_agent') {
+            $query->whereHas('inquiry', function($q) use ($user) {
+                $q->where('sales_agent', $user->id);
+            });
+        }
+        // Sales managers and admins can see all invoices
+        // No additional filtering needed for admin and sales_manager roles
+
+        $invoices = $query->orderBy('id', 'desc')->paginate($perPage);
+
         return view('admin.pages.invoice.index', [
             'invoices' => $invoices,
             'perPage' => $perPage,
@@ -34,7 +46,19 @@ class InvoiceController extends Controller
      */
     public function create()
     {
-        $inquiries = Inquiry::whereDoesntHave('invoice')->get();
+        $user = auth()->user();
+        $userRole = $user->role->slug ?? '';
+
+        // Build query for inquiries without invoices
+        $query = Inquiry::whereDoesntHave('invoice');
+
+        // Sales agents can only create invoices for their assigned inquiries
+        if ($userRole === 'sales_agent') {
+            $query->where('sales_agent', $user->id);
+        }
+        // Sales managers and admins can create invoices for all inquiries
+
+        $inquiries = $query->get();
         $users = User::all();
 
         return view('admin.pages.invoice.create', [
@@ -66,7 +90,19 @@ class InvoiceController extends Controller
      */
     public function show($id)
     {
-        $invoice = Invoice::with(['inquiry.vehicle', 'inquiry.customer', 'inquiry.user', 'creator'])->findOrFail($id);
+        $user = auth()->user();
+        $userRole = $user->role->slug ?? '';
+
+        $query = Invoice::with(['inquiry.vehicle', 'inquiry.customer', 'inquiry.user', 'creator']);
+
+        // Sales agents can only view invoices for their assigned inquiries
+        if ($userRole === 'sales_agent') {
+            $query->whereHas('inquiry', function($q) use ($user) {
+                $q->where('sales_agent', $user->id);
+            });
+        }
+
+        $invoice = $query->findOrFail($id);
 
         return view('admin.pages.invoice.show', [
             'invoice' => $invoice,
@@ -77,7 +113,10 @@ class InvoiceController extends Controller
      */
     public function edit($id)
     {
-        $invoice = Invoice::with([
+        $user = auth()->user();
+        $userRole = $user->role->slug ?? '';
+
+        $query = Invoice::with([
             'inquiry.vehicle.vehicleImages',
             'inquiry.inquiryCountry',
             'inquiry.customer',
@@ -87,7 +126,16 @@ class InvoiceController extends Controller
             'billingHistory.verifier',
             'creator',
             'verifier'
-        ])->findOrFail($id);
+        ]);
+
+        // Sales agents can only edit invoices for their assigned inquiries
+        if ($userRole === 'sales_agent') {
+            $query->whereHas('inquiry', function($q) use ($user) {
+                $q->where('sales_agent', $user->id);
+            });
+        }
+
+        $invoice = $query->findOrFail($id);
         
         $users = User::all();
         $vehicle_status = config('config.vehicle_status');

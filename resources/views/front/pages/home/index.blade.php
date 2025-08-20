@@ -141,7 +141,7 @@
                   ></span>
                 </div>
                 <img
-                  src="{{URL::asset ('/uploads/make_type')}}/{{ $row->image }}"
+                  src="{{URL::asset ('/uploads/maker_type')}}/{{ $row->image }}"
                   class="vehicle-make-image"
                   alt="{{$row->maker_type}}"
                 />

@@ -68,10 +68,10 @@
                         <i class="mdi mdi-file-pdf-outline"></i> Quotation PDF
                     </a>
                     @if($inquiry->invoice)
-                        <a href="{{ route('admin.inquiry.generateInvoice', $inquiry->id) }}" class="btn btn-success btn-sm" target="_blank">
+                        <a href="{{ route('admin.invoice.generatePDF', $inquiry->invoice->id) }}" class="btn btn-success btn-sm" target="_blank">
                             <i class="mdi mdi-receipt"></i> View Invoice
                         </a>
-                        <a href="{{ route('admin.invoice.edit', $inquiry->id) }}" class="btn btn-info btn-sm">
+                        <a href="{{ route('admin.invoice.edit', $inquiry->invoice->id) }}" class="btn btn-info btn-sm">
                             <i class="mdi mdi-file-document-edit"></i> Manage Billing
                         </a>
                     @else
@@ -101,6 +101,12 @@
                                 <div class="col-lg-7">#{{ $inquiry->id }}</div>
                             </div>
 
+                            @php
+                                $user = auth()->user();
+                                $userRole = $user->role->slug ?? '';
+                            @endphp
+
+                            @if($userRole !== 'sales_agent')
                             <div class="row mb-2">
                                 <div class="col-lg-5 font-weight-bold">Sales Agent</div>
                                 <div class="col-lg-7">
@@ -124,6 +130,17 @@
                                     </form>
                                 </div>
                             </div>
+                            @else
+                            <div class="row mb-2">
+                                <div class="col-lg-5 font-weight-bold">Sales Agent</div>
+                                <div class="col-lg-7">
+                                    {{ $inquiry->salesAgent->name ?? 'Not Assigned' }}
+                                    @if($inquiry->salesAgent)
+                                        ({{ $inquiry->salesAgent->email }})
+                                    @endif
+                                </div>
+                            </div>
+                            @endif
 
                             <div class="row mb-2">
                                 <div class="col-lg-5 font-weight-bold">Created At</div>
@@ -195,7 +212,9 @@
                                 <div class="col-lg-7">
                                     <div class="vehicle-image-container">
                                         @if($inquiry->vehicle && $inquiry->vehicle->vehicleImages->count() > 0)
-                                            <img src="{{ asset('uploads/vehicle/thumb/' . $inquiry->vehicle->vehicleImages[0]->image) }}" class="img-fluid rounded border" style="max-width: 150px; max-height: 100px; object-fit: cover;" alt="Vehicle Image">
+                                            <a href="{{ $inquiry->site_url }}" target = "_blank">
+                                                <img src="{{ asset('uploads/vehicle/'.$inquiry->vehicle->id.'/thumb/'.$inquiry->vehicle->vehicleImages[0]->image) }}" class="img-fluid rounded border" style="max-width: 150px; max-height: 100px; object-fit: cover;" alt="Vehicle Image">
+                                            </a>
                                         @else
                                             <div class="border rounded d-flex align-items-center justify-content-center bg-light" style="width: 150px; height: 100px;">
                                                 <div class="text-center text-muted">
@@ -217,11 +236,33 @@
                                         <input type="hidden" name="update_type" value="vehicle_status">
                                         <div class="mb-2">
                                             <select class="form-control" name="vehicle_status" id="vehicle-status-select">
-                                                @foreach($vehicle_status as $status)
+                                                @php
+                                                    $user = auth()->user();
+                                                    $userRole = $user->role->slug ?? '';
+
+                                                    // Define allowed statuses for sales agents
+                                                    $salesAgentStatuses = ['Open', 'Reserved', 'Prepare for Shipment', 'Inactive'];
+
+                                                    // Filter statuses based on user role
+                                                    if ($userRole === 'sales_agent') {
+                                                        $allowedStatuses = array_intersect($vehicle_status, $salesAgentStatuses);
+                                                    } else {
+                                                        $allowedStatuses = $vehicle_status;
+                                                    }
+                                                @endphp
+
+                                                @foreach($allowedStatuses as $status)
                                                     <option value="{{ $status }}" {{ $inquiry->vehicle_status === $status ? 'selected' : '' }}>
                                                         {{ $status }}
                                                     </option>
                                                 @endforeach
+
+                                                @if($userRole === 'sales_agent' && !in_array($inquiry->vehicle_status, $salesAgentStatuses))
+                                                    {{-- Show current status even if not in allowed list, but make it read-only --}}
+                                                    <option value="{{ $inquiry->vehicle_status }}" selected disabled>
+                                                        {{ $inquiry->vehicle_status }} (Read Only)
+                                                    </option>
+                                                @endif
                                             </select>
                                         </div>
                                         <button type="submit" class="btn btn-success btn-sm" id="vehicle-status-btn" style="{{ $inquiry->vehicle_status === 'Reserved' ? 'display: none;' : '' }}">
@@ -353,7 +394,9 @@
                                 <div class="col-6">
                                     <div class="input-group">
                                         <span class="input-group-text">$</span>
-                                        <input type="number" class="form-control text-end" name="discount" value="{{ $inquiry->discount ?? 0 }}" onchange="calculateTotal()">
+                                        <input type="number" class="form-control text-end {{ $userRole === 'sales_agent' ? 'bg-light' : '' }}"
+                                               name="discount" value="{{ $inquiry->discount ?? 0 }}"
+                                               onchange="calculateTotal()" {{ $userRole === 'sales_agent' ? 'readonly' : '' }}>
                                     </div>
                                 </div>
                             </div>
@@ -366,6 +409,7 @@
                                 <input type="hidden" name="update_type" value="total_discount">
                                 <input type="hidden" name="total_price" id="hidden-total" value="{{ ($inquiry->fob_price ?? 0) + ($inquiry->freight_fee ?? 0) + ($inquiry->insurance ?? 0) + ($inquiry->inspection ?? 0) - ($inquiry->discount ?? 0) }}">
                                 <input type="hidden" name="discount" id="hidden-discount" value="{{ $inquiry->discount ?? 0 }}">
+                                <input type="hidden" name="vehicle_status" id="hidden-vehicle-status" value="{{ $inquiry->vehicle_status }}">
                                 
                                 <div class="row mb-3">
                                     <div class="col-6">
@@ -377,12 +421,13 @@
                                         </span>
                                     </div>
                                 </div>
-
+                                @if($userRole !== 'sales_agent')                      
                                 <div class="text-end">
                                     <button type="submit" class="btn btn-success btn-sm">
                                         <i class="mdi mdi-check"></i> Update
                                     </button>
                                 </div>
+                                @endif
                             </form>
 
                              <div class="mt-4 text-muted small price-notes">
@@ -405,20 +450,26 @@ $(document).ready(function() {
     $('#vehicle-status-select').on('change', function() {
         const expirySection = $('#expiry-date-section');
         const statusBtn = $('#vehicle-status-btn');
-        
-        if ($(this).val() === 'Reserved') {
+        const selectedStatus = $(this).val();
+
+        if (selectedStatus === 'Reserved') {
             expirySection.show();
             statusBtn.hide();
         } else {
             expirySection.hide();
             statusBtn.show();
         }
+
+        // Update hidden field for main form submission
+        $('#hidden-vehicle-status').val(selectedStatus);
     });
     
-    // Calculate total when discount changes
+    // Calculate total when discount changes (only for non-sales agents)
+    @if($userRole !== 'sales_agent')
     $('input[name="discount"]').on('input change', function() {
         calculateTotal();
     });
+    @endif
 });
 
 function calculateTotal() {

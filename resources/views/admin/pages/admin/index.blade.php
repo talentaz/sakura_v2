@@ -88,6 +88,67 @@
             </div>
             <!-- end row -->
         </div>
+        <div class="col-xl-12">
+            <div class="row">
+                <div class="col-xl-4">
+                    <div class="card mini-stats-wid">
+                        <div class="card-body">
+                            <div class="d-flex flex-wrap">
+                                <div class="me-3">
+                                    <p class="text-muted mb-2">Total Ask Inquiries</p>
+                                    <h5 class="mb-0">{{$vehicle->count}}</h5>
+                                </div>
+
+                                <div class="avatar-sm ms-auto">
+                                    <div class="avatar-title bg-light rounded-circle text-primary font-size-20">
+                                        <i class="bx bxs-car"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4">
+                    <div class="card mini-stats-wid">
+                        <div class="card-body">
+                            <div class="d-flex flex-wrap">
+                                <div class="me-3">
+                                    <p class="text-muted mb-2">Pending Invoices</p>
+                                    <h5 class="mb-0">{{$vehicle->count}}</h5>
+                                </div>
+
+                                <div class="avatar-sm ms-auto">
+                                    <div class="avatar-title bg-light rounded-circle text-primary font-size-20">
+                                        <i class="bx bxs-car"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-4">
+                    <div class="card mini-stats-wid">
+                        <div class="card-body">
+                            <div class="d-flex flex-wrap">
+                                <div class="me-3">
+                                    <p class="text-muted mb-2">Verified/Completed Invoices</p>
+                                    <h5 class="mb-0">{{$vehicle->count}}</h5>
+                                </div>
+
+                                <div class="avatar-sm ms-auto">
+                                    <div class="avatar-title bg-light rounded-circle text-primary font-size-20">
+                                        <i class="bx bxs-car"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="col-xl-7">
             <!-- registered user chart -->
             <div class="card">

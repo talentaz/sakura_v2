@@ -19,10 +19,20 @@ class InquiryController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 10); // Default to 10 entries
+        $user = auth()->user();
+        $userRole = $user->role->slug ?? '';
 
-        $inquiries = Inquiry::with(['vehicle', 'user', 'invoice'])
-            ->orderBy('id', 'desc')
-            ->paginate($perPage);
+        // Build query with role-based filtering
+        $query = Inquiry::with(['vehicle', 'user', 'invoice']);
+
+        // Sales agents can only see their assigned inquiries
+        if ($userRole === 'sales_agent') {
+            $query->where('sales_agent', $user->id);
+        }
+        // Sales managers and admins can see all inquiries
+        // No additional filtering needed for admin and sales_manager roles
+
+        $inquiries = $query->orderBy('id', 'desc')->paginate($perPage);
 
         return view('admin.pages.inquiry.index', [
             'inquiries' => $inquiries,
@@ -68,7 +78,17 @@ class InquiryController extends Controller
      */
     public function show($id)
     {
-        $inquiry = Inquiry::with(['vehicle', 'user'])->findOrFail($id);
+        $user = auth()->user();
+        $userRole = $user->role->slug ?? '';
+
+        $query = Inquiry::with(['vehicle', 'user']);
+
+        // Sales agents can only view their assigned inquiries
+        if ($userRole === 'sales_agent') {
+            $query->where('sales_agent', $user->id);
+        }
+
+        $inquiry = $query->findOrFail($id);
 
         return view('admin.pages.inquiry.show', [
             'inquiry' => $inquiry,
@@ -80,7 +100,10 @@ class InquiryController extends Controller
      */
     public function edit($id)
     {
-        $inquiry = Inquiry::with([
+        $user = auth()->user();
+        $userRole = $user->role->slug ?? '';
+
+        $query = Inquiry::with([
             'vehicle' => function($query) {
                 $query->with(['vehicleImages' => function($imageQuery) {
                     $imageQuery->orderByRaw('CONVERT(image, SIGNED) ASC')->limit(1);
@@ -90,7 +113,14 @@ class InquiryController extends Controller
             'salesAgent',
             'inquiryCountry',
             'invoice'
-        ])->findOrFail($id);
+        ]);
+
+        // Sales agents can only edit their assigned inquiries
+        if ($userRole === 'sales_agent') {
+            $query->where('sales_agent', $user->id);
+        }
+
+        $inquiry = $query->findOrFail($id);
         
         $users = User::with('role')
             ->where('id', '!=', auth()->id())
@@ -111,7 +141,17 @@ class InquiryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $inquiry = Inquiry::findOrFail($id);
+        $user = auth()->user();
+        $userRole = $user->role->slug ?? '';
+
+        $query = Inquiry::query();
+
+        // Sales agents can only update their assigned inquiries
+        if ($userRole === 'sales_agent') {
+            $query->where('sales_agent', $user->id);
+        }
+
+        $inquiry = $query->findOrFail($id);
         $updateType = $request->input('update_type');
         switch ($updateType) {
             case 'sales_agent':
@@ -123,10 +163,20 @@ class InquiryController extends Controller
                 break;
 
             case 'vehicle_status':
-                
-                // $request->validate([
-                //     'vehicle_status' => 'required|in:Open, Reserved, Prepare for Shipment, Ready to Ship, Completed, Inactive',
-                // ]);
+                // Define allowed statuses for sales agents
+                $salesAgentStatuses = ['Open', 'Reserved', 'Prepare for Shipment', 'Inactive'];
+
+                // Validate based on user role
+                if ($userRole === 'sales_agent') {
+                    $request->validate([
+                        'vehicle_status' => 'required|string|in:' . implode(',', $salesAgentStatuses),
+                    ]);
+                } else {
+                    $request->validate([
+                        'vehicle_status' => 'required|string',
+                    ]);
+                }
+
                 $inquiry->vehicle_status = $request->vehicle_status;
 
                 // Clear expiry date if status is not Reserved
@@ -150,13 +200,36 @@ class InquiryController extends Controller
                 break;
 
             case 'total_discount':
-                $request->validate([
+                $validationRules = [
                     'total_price' => 'required|numeric|min:0',
                     'discount' => 'nullable|numeric|min:0',
-                ]);
+                ];
+
+                // Add vehicle status validation if provided
+                if ($request->has('vehicle_status')) {
+                    if ($userRole === 'sales_agent') {
+                        $salesAgentStatuses = ['Open', 'Reserved', 'Prepare for Shipment', 'Inactive'];
+                        $validationRules['vehicle_status'] = 'required|string|in:' . implode(',', $salesAgentStatuses);
+                    } else {
+                        $validationRules['vehicle_status'] = 'required|string';
+                    }
+                }
+
+                $request->validate($validationRules);
+
                 $inquiry->total_price = $request->total_price;
-                $inquiry->discount = $request->discount;
-                $message = 'Total price and discount updated successfully!';
+
+                // Only update discount if user is not a sales agent (discount is read-only for sales agents)
+                if ($userRole !== 'sales_agent') {
+                    $inquiry->discount = $request->discount;
+                }
+
+                // Update vehicle status if provided
+                if ($request->has('vehicle_status')) {
+                    $inquiry->vehicle_status = $request->vehicle_status;
+                }
+
+                $message = 'Information updated successfully!';
                 break;
 
             default:
@@ -173,7 +246,17 @@ class InquiryController extends Controller
      */
     public function destroy($id)
     {
-        $inquiry = Inquiry::findOrFail($id);
+        $user = auth()->user();
+        $userRole = $user->role->slug ?? '';
+
+        $query = Inquiry::query();
+
+        // Sales agents can only delete their assigned inquiries
+        if ($userRole === 'sales_agent') {
+            $query->where('sales_agent', $user->id);
+        }
+
+        $inquiry = $query->findOrFail($id);
         $inquiry->delete();
 
         return redirect()->route('admin.inquiry.index')
@@ -186,7 +269,17 @@ class InquiryController extends Controller
     public function detail(Request $request)
     {
         $id = $request->id;
-        $inquiry = Inquiry::with(['vehicle', 'user'])->findOrFail($id);
+        $user = auth()->user();
+        $userRole = $user->role->slug ?? '';
+
+        $query = Inquiry::with(['vehicle', 'user']);
+
+        // Sales agents can only view details of their assigned inquiries
+        if ($userRole === 'sales_agent') {
+            $query->where('sales_agent', $user->id);
+        }
+
+        $inquiry = $query->findOrFail($id);
 
         return response()->json([
             'result' => true,
@@ -199,13 +292,35 @@ class InquiryController extends Controller
      */
     public function updateStatus(Request $request)
     {
-        $request->validate([
-            'id' => 'required|exists:inquiry,id',
-            'status' => 'required|string',
-            'reserved_expiry_date' => 'nullable|date',
-        ]);
+        $user = auth()->user();
+        $userRole = $user->role->slug ?? '';
 
-        $inquiry = Inquiry::findOrFail($request->id);
+        // Define allowed statuses for sales agents
+        $salesAgentStatuses = ['Open', 'Reserved', 'Prepare for Shipment', 'Inactive'];
+
+        // Validate based on user role
+        if ($userRole === 'sales_agent') {
+            $request->validate([
+                'id' => 'required|exists:inquiry,id',
+                'status' => 'required|string|in:' . implode(',', $salesAgentStatuses),
+                'reserved_expiry_date' => 'nullable|date',
+            ]);
+        } else {
+            $request->validate([
+                'id' => 'required|exists:inquiry,id',
+                'status' => 'required|string',
+                'reserved_expiry_date' => 'nullable|date',
+            ]);
+        }
+
+        $query = Inquiry::query();
+
+        // Sales agents can only update status of their assigned inquiries
+        if ($userRole === 'sales_agent') {
+            $query->where('sales_agent', $user->id);
+        }
+
+        $inquiry = $query->findOrFail($request->id);
         $inquiry->vehicle_status = $request->status;
 
         if ($request->reserved_expiry_date) {
@@ -238,7 +353,17 @@ class InquiryController extends Controller
      */
     public function generateInvoice($id)
     {
-        $inquiry = Inquiry::with(['vehicle', 'user'])->findOrFail($id);
+        $user = auth()->user();
+        $userRole = $user->role->slug ?? '';
+
+        $query = Inquiry::with(['vehicle', 'user', 'invoice', 'salesAgent', 'inquiryCountry']);
+
+        // Sales agents can only view invoice generation for their assigned inquiries
+        if ($userRole === 'sales_agent') {
+            $query->where('sales_agent', $user->id);
+        }
+
+        $inquiry = $query->findOrFail($id);
 
         return view('admin.pages.inquiry.invoice', [
             'inquiry' => $inquiry,
@@ -250,7 +375,17 @@ class InquiryController extends Controller
      */
     public function createInvoice($id)
     {
-        $inquiry = Inquiry::findOrFail($id);
+        $user = auth()->user();
+        $userRole = $user->role->slug ?? '';
+
+        $query = Inquiry::query();
+
+        // Sales agents can only create invoices for their assigned inquiries
+        if ($userRole === 'sales_agent') {
+            $query->where('sales_agent', $user->id);
+        }
+
+        $inquiry = $query->findOrFail($id);
 
         // Check if invoice already exists
         if ($inquiry->invoice) {

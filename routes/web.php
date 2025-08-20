@@ -268,7 +268,7 @@ Route::prefix('/admin')->middleware(['auth:web', 'role:admin,sales_manager,sales
             Route::get('/', [App\Http\Controllers\Admin\InvoiceController::class, 'index'])->name('admin.invoice.index');
             Route::get('/create', [App\Http\Controllers\Admin\InvoiceController::class, 'create'])->name('admin.invoice.create');
             Route::post('/store', [App\Http\Controllers\Admin\InvoiceController::class, 'store'])->name('admin.invoice.store');
-            Route::get('/{inquiry_id}/edit', [App\Http\Controllers\Admin\InvoiceController::class, 'edit'])->name('admin.invoice.edit');
+            Route::get('/{id}/edit', [App\Http\Controllers\Admin\InvoiceController::class, 'edit'])->name('admin.invoice.edit');
             Route::get('/{id}/generate-pdf', [App\Http\Controllers\Admin\InvoiceController::class, 'generatePDF'])->name('admin.invoice.generatePDF');
             Route::post('/billing/store', [App\Http\Controllers\Admin\InvoiceController::class, 'storeBilling'])->name('admin.invoice.billing.store');
             Route::put('/billing/verify/{invoice_id}', [App\Http\Controllers\Admin\InvoiceController::class, 'verifyBilling'])->name('admin.invoice.billing.verify');

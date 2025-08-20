@@ -42,8 +42,7 @@
                             <div class="row mb-2">
                                 <div class="col-lg-5 font-weight-bold">Sales Agent</div>
                                 <div class="col-lg-7">
-                                    {{ $invoice->inquiry->salesAgent ?? $invoice->inquiry->salesAgent->name ?? 'N/A'}}
-                                    <br><small class="text-muted">({{ $invoice->salesAgent ?? $invoice->salesAgent->email ?? 'N/A'}})</small>
+                                    {{$invoice->inquiry->salesAgent->name ? $invoice->inquiry->salesAgent->name : 'N/A'}}
                                 </div>
                             </div>
 
@@ -116,9 +115,12 @@
                                 <div class="col-lg-12">
                                     <strong>Vehicle Image</strong>
                                     <div class="vehicle-image-container mt-2">
-                                        @if($invoice->vehicleImages)
-                                            <img src="{{ asset('uploads/vehicle/thumb/' . $invoice->vehicleImages->image) }}"
+                                        
+                                        @if($invoice->inquiry->vehicle->vehicleImages->count() > 0)
+                                        <a href="{{ $invoice->inquiry->site_url }}" target = "_blank">
+                                            <img src="{{ asset('uploads/vehicle/'.$invoice->inquiry->vehicle->id.'/thumb/'.$invoice->inquiry->vehicle->vehicleImages[0]->image) }}"
                                                  alt="Vehicle Image" class="img-fluid" style="max-width: 150px; border-radius: 5px;">
+                                        </a>
                                         @else
                                             <div class="border d-flex align-items-center justify-content-center" 
                                                  style="height: 100px; background-color: #f8f9fa;">
