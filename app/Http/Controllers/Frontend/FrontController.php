@@ -78,7 +78,9 @@ class FrontController extends Controller
                             ->select('a.*', DB::raw('IFNULL(b.cnt, 0) as cnt'))
                             ->leftJoin(DB::raw('(SELECT make_type, COUNT(*) as cnt FROM vehicle WHERE deleted_at IS NULL GROUP BY make_type) b'), 'a.maker_type', '=', 'b.make_type')
                             ->orderBy('a.order_id')
+                            ->whereNull('a.deleted_at')
                             ->get();
+                            
         $vehicle_type = DB::table('vehicle_types as a')
                             ->select('a.*', DB::raw('IFNULL(b.cnt, 0) as cnt'))
                             ->leftJoin(
@@ -92,6 +94,7 @@ class FrontController extends Controller
                                 '=',
                                 'b.body_type'
                             )
+                            ->whereNull('a.deleted_at')
                             ->orderBy('a.order_id')
                             ->get();
 

@@ -223,6 +223,7 @@ Route::prefix('/admin')->middleware(['auth:web', 'role:admin,sales_manager,sales
             Route::get('/{id}/edit', [App\Http\Controllers\Admin\PageSettingController::class, 'edit'])->name('admin.page_setting.edit');
             Route::post('/{id}/edit', [App\Http\Controllers\Admin\PageSettingController::class, 'update'])->name('admin.page_setting.update');
             Route::delete('/{id}', [App\Http\Controllers\Admin\PageSettingController::class, 'destroy'])->name('admin.page_setting.destroy');
+            Route::post('/create-about-us', [App\Http\Controllers\Admin\PageSettingController::class, 'createAboutUsPages'])->name('admin.page_setting.create_about_us');
         });
     });
 

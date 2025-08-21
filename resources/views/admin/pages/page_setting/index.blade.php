@@ -15,9 +15,14 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h4 class="card-title">Page Settings</h4>
-                        <a href="{{ route('admin.page_setting.create') }}" class="btn btn-primary">
-                            <i class="fas fa-plus"></i> Create Page
-                        </a>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-success" id="create-about-us-btn">
+                                <i class="fas fa-info-circle"></i> Create About Us Pages
+                            </button>
+                            <a href="{{ route('admin.page_setting.create') }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Create Page
+                            </a>
+                        </div>
                     </div>
                     <div class="table-responsive">
                         <table id="datatable" class="table table-bordered dt-responsive nowrap w-100">
@@ -148,6 +153,43 @@
                 });
 
                 $('#deleteModal').modal('hide');
+            }
+        });
+
+        // Create About Us Pages Button
+        $('#create-about-us-btn').on('click', function() {
+            if (confirm('This will create the About Us pages (Company, Gallery, Payment). Continue?')) {
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+
+                $.ajax({
+                    url: '{{ route("admin.page_setting.create_about_us") }}',
+                    method: 'POST',
+                    beforeSend: function() {
+                        $('#create-about-us-btn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Creating...');
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            toastr.success(response.message + ' (' + response.pages_created + ' pages)');
+                            location.reload();
+                        } else {
+                            toastr.error(response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        let errorMessage = 'An error occurred while creating About Us pages.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+                        toastr.error(errorMessage);
+                    },
+                    complete: function() {
+                        $('#create-about-us-btn').prop('disabled', false).html('<i class="fas fa-info-circle"></i> Create About Us Pages');
+                    }
+                });
             }
         });
     </script>
