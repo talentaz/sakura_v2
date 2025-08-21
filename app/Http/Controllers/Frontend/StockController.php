@@ -85,6 +85,7 @@ class StockController extends Controller
                     ->leftJoin(DB::raw('(SELECT body_type, COUNT(*) cnt FROM vehicle WHERE deleted_at IS NULL GROUP BY body_type) as b'), 'a.vehicle_type', '=', 'b.body_type')
                     ->select('a.*', DB::raw('IFNULL(b.cnt, 0) AS cnt'))
                     ->orderBy('a.order_id')
+                    ->whereNull('a.deleted_at')
                     ->get();
         // $make_type = DB::select('SELECT  a.*,
         //                     IFNULL(b.cnt, 0) AS cnt
@@ -102,6 +103,7 @@ class StockController extends Controller
                             ->select('a.*', DB::raw('IFNULL(b.cnt, 0) as cnt'))
                             ->leftJoin(DB::raw('(SELECT make_type, COUNT(*) as cnt FROM vehicle WHERE deleted_at IS NULL GROUP BY make_type) b'), 'a.maker_type', '=', 'b.make_type')
                             ->orderBy('a.order_id')
+                            ->whereNull('a.deleted_at')
                             ->get();
         //general and advanced search form
         $search_keyword = $request->search_keyword;
