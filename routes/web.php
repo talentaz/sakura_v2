@@ -36,8 +36,17 @@ Route::get('/gallery/image', [App\Http\Controllers\Frontend\ContactController::c
 Route::get('/gallery/video', [App\Http\Controllers\Frontend\GalleryController::class, 'index'])->name('front.video.gallery');
 Route::get('/gallery/video/fetch_data', [App\Http\Controllers\Frontend\GalleryController::class, 'fetch_data'])->name('front.video.fetch_data');
 Route::get('/payment', [App\Http\Controllers\Frontend\ContactController::class, 'payment'])->name('front.payment');
+
+
 Route::get('/blog', [App\Http\Controllers\Frontend\BlogController::class, 'index'])->name('front.blog');
 Route::get('/blog/{id}', [App\Http\Controllers\Frontend\BlogController::class, 'details'])->name('front.blog.detail');
+
+// News routes with hero layout
+Route::get('/news', [App\Http\Controllers\Frontend\NewsController::class, 'index'])->name('front.news');
+Route::get('/news/{id}', [App\Http\Controllers\Frontend\NewsController::class, 'detail'])->name('front.news.detail');
+
+// Testimonials route
+Route::get('/testimonials', [App\Http\Controllers\Frontend\TestimonialController::class, 'index'])->name('front.testimonials');
 Route::get('/customer_vocie', [App\Http\Controllers\Frontend\CustomerController::class, 'index'])->name('front.customer_vocie');
 
 // Customer Authentication Routes
@@ -223,7 +232,6 @@ Route::prefix('/admin')->middleware(['auth:web', 'role:admin,sales_manager,sales
             Route::get('/{id}/edit', [App\Http\Controllers\Admin\PageSettingController::class, 'edit'])->name('admin.page_setting.edit');
             Route::post('/{id}/edit', [App\Http\Controllers\Admin\PageSettingController::class, 'update'])->name('admin.page_setting.update');
             Route::delete('/{id}', [App\Http\Controllers\Admin\PageSettingController::class, 'destroy'])->name('admin.page_setting.destroy');
-            Route::post('/create-about-us', [App\Http\Controllers\Admin\PageSettingController::class, 'createAboutUsPages'])->name('admin.page_setting.create_about_us');
         });
     });
 

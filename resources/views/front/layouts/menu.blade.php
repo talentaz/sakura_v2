@@ -21,10 +21,11 @@
                                 <li><a href="{{ route('front.company') }}">About Company</a></li>
                                 <li><a href="{{ route('front.gallery') }}">Gallery</a></li>
                                 <li><a href="{{ route('front.payment') }}">Payment</a></li>
+                                <li><a href="{{ route('front.testimonials') }}">Testimonials</a></li>
                             </ul>
                         </li>
-                        <li><a href="#">News</a></li>
-                        <li><a href="#">Contact Us</a></li>
+                        <li><a href="{{ route('front.news') }}" class="{{  request()->routeIs('front.news*') ? 'active' : '' }}">News</a></li>
+                        <li><a href="{{ route('front.contact') }}" class="{{  request()->routeIs('front.contact') ? 'active' : '' }}">Contact Us</a></li>
                         <li class="dropdown">
                             <a href="#">Whatsapp <i class="fas fa-chevron-down"></i></a>
                             <ul class="dropdown-menu">
@@ -102,7 +103,8 @@
                 <li><a href="{{ route('front.company') }}" class="{{ request()->routeIs('front.company') ? 'active' : '' }}">Company Profile</a></li>
                 <li><a href="{{ route('front.gallery') }}" class="{{ request()->routeIs('front.gallery') ? 'active' : '' }}">Gallery</a></li>
                 <li><a href="{{ route('front.payment') }}" class="{{ request()->routeIs('front.payment') ? 'active' : '' }}">Payment</a></li>
-                <li><a href="#">News</a></li>
+                <li><a href="{{ route('front.testimonials') }}" class="{{ request()->routeIs('front.testimonials') ? 'active' : '' }}">Testimonials</a></li>
+                <li><a href="{{ route('front.news') }}" class="{{ request()->routeIs('front.news*') ? 'active' : '' }}">News</a></li>
                 <li><a href="{{ route('front.contact') }}" class="{{ request()->routeIs('front.contact') ? 'active' : '' }}">Contact Us</a></li>
             </ul>
             <div class="cont-info">

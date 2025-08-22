@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create News Placeholder</title>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="600" style="display: none;"></canvas>
+    
+    <script>
+        function createNewsPlaceholder() {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, 800, 600);
+            
+            // Create gradient background
+            const gradient = ctx.createLinearGradient(0, 0, 800, 600);
+            gradient.addColorStop(0, '#f8f9fa');
+            gradient.addColorStop(1, '#e9ecef');
+            
+            // Fill background
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 800, 600);
+            
+            // Add Sakura Motors logo area
+            ctx.fillStyle = '#d42028';
+            ctx.globalAlpha = 0.3;
+            ctx.beginPath();
+            ctx.arc(400, 250, 80, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+            
+            // Add text
+            ctx.fillStyle = '#666666';
+            ctx.font = 'bold 32px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('News Image', 400, 350);
+            
+            ctx.fillStyle = '#999999';
+            ctx.font = '24px Arial';
+            ctx.fillText('Sakura Motors', 400, 390);
+            
+            // Convert to blob and download
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'news-placeholder.jpg';
+                a.click();
+                URL.revokeObjectURL(url);
+            }, 'image/jpeg', 0.9);
+        }
+        
+        // Auto-generate on load
+        setTimeout(createNewsPlaceholder, 500);
+    </script>
+    
+    <p>News placeholder image will be downloaded automatically.</p>
+    <button onclick="createNewsPlaceholder()">Download News Placeholder</button>
+</body>
+</html>

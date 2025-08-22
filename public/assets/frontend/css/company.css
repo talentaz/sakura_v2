@@ -1,0 +1,365 @@
+/* Company Page CSS */
+
+/* Welcome Section */
+.welcome-section {
+    padding: 50px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.welcome-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+}
+
+.welcome-text {
+    padding-right: 20px;
+}
+
+.welcome-text h2 {
+    font-size: 35px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 30px;
+    line-height: 1.2;
+    position: relative;
+}
+
+.welcome-text p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.welcome-text p:last-child {
+    margin-bottom: 0;
+}
+
+.welcome-image {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    transform: perspective(1000px) rotateY(-5deg);
+    transition: transform 0.3s ease;
+}
+
+.welcome-image:hover {
+    transform: perspective(1000px) rotateY(0deg);
+}
+
+.welcome-image img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.welcome-image:hover img {
+    transform: scale(1.05);
+}
+.slider-section {
+    padding: 96px 0 48px 0;
+    background: var(--primary-pink);
+}
+.m-head {
+    padding: 0;
+}
+/* Company Details Section */
+.company-details-section {
+    padding: 80px 0;
+    background: #f8f9fa;
+    position: relative;
+}
+
+.details-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: start;
+}
+
+/* Mission & Vision */
+.mission-vision {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.mission-item,
+.vision-item {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.vision-item {
+    animation-delay: 0.2s;
+}
+
+.mission-item:hover,
+.vision-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+}
+
+.mission-item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #d42028, #f01823);
+}
+
+.vision-item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #28a745, #20c997);
+}
+
+.icon-wrapper {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 20px;
+}
+
+.mission-icon,
+.vision-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+}
+
+.mission-icon {
+    background: linear-gradient(135deg, #d42028, #f01823);
+}
+
+.vision-icon {
+    background: linear-gradient(135deg, #28a745, #20c997);
+}
+
+.mission-item h3,
+.vision-item h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 15px;
+    margin-top: 9px;
+}
+
+.mission-item p,
+.vision-item p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #666;
+    margin: 0;
+}
+
+/* Company Info */
+.company-info {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    position: relative;
+    animation: fadeInLeft 0.8s ease-out 0.3s both;
+}
+
+.info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.info-header h3 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+}
+
+.contact-phone {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #333;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.contact-phone svg {
+    color: #333;
+}
+
+.info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.info-item {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 20px;
+}
+
+.label {
+    font-weight: 600;
+    color: #666;
+    font-size: 15px;
+}
+
+.value {
+    color: #333;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+/* CSS Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .welcome-content {
+        gap: 40px;
+    }
+
+    .details-content {
+        gap: 40px;
+    }
+
+    .info-item {
+        grid-template-columns: 150px 1fr;
+    }
+
+    .welcome-text h2 {
+        font-size: 36px;
+    }
+
+    .welcome-image {
+        transform: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .welcome-section {
+        padding: 60px 0;
+    }
+
+    .welcome-content {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        text-align: center;
+    }
+
+    .company-details-section {
+        padding: 60px 0;
+    }
+
+    .details-content {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .info-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .info-item {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .mission-item,
+    .vision-item {
+        padding: 25px;
+    }
+
+    .welcome-text {
+        padding-right: 0;
+    }
+
+    .welcome-text h2 {
+        font-size: 32px;
+    }
+
+    .welcome-text h2::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .welcome-image img {
+        height: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-section {
+        padding: 40px 0;
+    }
+
+    .welcome-text h2 {
+        font-size: 28px;
+    }
+
+    .welcome-text p {
+        font-size: 15px;
+    }
+
+    .welcome-image img {
+        height: 250px;
+    }
+    .contact-phone {
+        display: none;
+    }
+    .info-item {
+        display: block;
+    }
+}

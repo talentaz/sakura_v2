@@ -348,7 +348,7 @@
             </div>
             <div class="heading-arrive">
                 <h2>Our Customers Feedback</h2>
-                <a href="#" class="view-more">View All Reviews</a>
+                <a href="{{ route('front.testimonials') }}" class="view-more">View All Reviews</a>
             </div>
             <div class="slider-container">
                 <div class="slides-wrapper" id="slidesWrapper">
@@ -382,7 +382,7 @@
                     </button>
                 </div>
             </div>
-            <a href="#" class="view-more view-mbl">View All Reviews</a>
+            <a href="{{ route('front.testimonials') }}" class="view-more view-mbl">View All Reviews</a>
         </div>
     </section>
     <section class="bg-relative2">
@@ -390,10 +390,10 @@
       <div class="container">
         <div class="heading-arrive">
           <h2>Latest News</h2>
-          <a href="#" class="view-more">View All News</a>
+          <a href="{{ route('front.news') }}" class="view-more">View All News</a>
         </div>
         <div class="hero-section">
-          <div class="hero-card large-card">
+          <a href="{{ route('front.news.detail', ['id' => $news[0]->id]) }}" class="hero-card large-card">
             <img
               src="{{URL::asset ('/uploads/news')}}{{'/'}}{{$news[0]->id}}/{{ $news[0]->image }}"
               alt="{{ $news[0]->image }}"
@@ -405,22 +405,22 @@
                 {!! Str::limit(strip_tags($news[0]->description), 300,'.....') !!}
               </p>
             </div>
-          </div>
+          </a>
           <div class="side-cards">
-            <div class="hero-card small-card">
+            <a href="{{ route('front.news.detail', ['id' => $news[1]->id]) }}" class="hero-card small-card">
               <img src="{{URL::asset ('/uploads/news')}}{{'/'}}{{$news[1]->id}}/{{ $news[1]->image }}" alt="{{ $news[1]->image }}" />
               <div class="card-overlay">
                 <p class="date">On {{ \Carbon\Carbon::parse($news[1]->date)->format('d/m/Y') }}</p>
                 <h2>{{ $news[1]->title }}</h2>
               </div>
-            </div>
-            <div class="hero-card small-card">
+            </a>
+            <a href="{{ route('front.news.detail', ['id' => $news[2]->id]) }}" class="hero-card small-card">
               <img src="{{URL::asset ('/uploads/news')}}{{'/'}}{{$news[2]->id}}/{{ $news[2]->image }}" alt="{{ $news[2]->image }}" />
               <div class="card-overlay">
                 <p class="date">On {{ \Carbon\Carbon::parse($news[2]->date)->format('d/m/Y') }}</p>
                 <h2>{{ $news[2]->title }}</h2>
               </div>
-            </div>
+            </a>
           </div>
         </div>
         <!-- <div class="social-link-main">

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Team Images</title>
+</head>
+<body>
+    <canvas id="canvas" width="200" height="200" style="display: none;"></canvas>
+    
+    <script>
+        function createTeamImage(name, initials, color) {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, 200, 200);
+            
+            // Create gradient background
+            const gradient = ctx.createLinearGradient(0, 0, 200, 200);
+            gradient.addColorStop(0, color);
+            gradient.addColorStop(1, '#ffffff');
+            
+            // Fill background
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, 200, 200);
+            
+            // Add initials
+            ctx.fillStyle = '#333333';
+            ctx.font = 'bold 60px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(initials, 100, 100);
+            
+            // Convert to blob and download
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = name + '.jpg';
+                a.click();
+                URL.revokeObjectURL(url);
+            }, 'image/jpeg', 0.9);
+        }
+        
+        // Generate images
+        setTimeout(() => createTeamImage('yuseph', 'YK', '#e3f2fd'), 500);
+        setTimeout(() => createTeamImage('sia', 'SC', '#f3e5f5'), 1000);
+        setTimeout(() => createTeamImage('ally', 'AL', '#e8f5e8'), 1500);
+    </script>
+    
+    <p>Click the buttons below to download sample team images:</p>
+    <button onclick="createTeamImage('yuseph', 'YK', '#e3f2fd')">Download Yuseph Image</button>
+    <button onclick="createTeamImage('sia', 'SC', '#f3e5f5')">Download Sia Image</button>
+    <button onclick="createTeamImage('ally', 'AL', '#e8f5e8')">Download Ally Image</button>
+</body>
+</html>

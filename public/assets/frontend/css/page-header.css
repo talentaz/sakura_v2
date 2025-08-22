@@ -1,0 +1,100 @@
+/* Page Header Component CSS */
+
+.page-header {
+    background: var(--primary-color);
+    color: white;
+    padding: 60px 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.page-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(212, 32, 40, 0.9) 0%, rgba(176, 24, 32, 0.9) 100%);
+    z-index: 1;
+}
+
+.page-header .container {
+    position: relative;
+    z-index: 2;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.page-header p {
+    font-size: 1.1rem;
+    margin-top: 10px;
+    opacity: 0.9;
+}
+
+/* Breadcrumb in header */
+.page-header .breadcrumb {
+    background: transparent;
+    padding: 0;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.page-header .breadcrumb-item {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.page-header .breadcrumb-item + .breadcrumb-item::before {
+    color: rgba(255, 255, 255, 0.6);
+    content: "›";
+}
+
+.page-header .breadcrumb-item.active {
+    color: white;
+    font-weight: 600;
+}
+
+.page-header .breadcrumb-item a {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.page-header .breadcrumb-item a:hover {
+    color: white;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 40px 0;
+    }
+
+    .page-header h1 {
+        font-size: 1.8rem;
+        letter-spacing: 1px;
+    }
+    
+    .page-header p {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header {
+        padding: 30px 0;
+    }
+
+    .page-header h1 {
+        font-size: 1.5rem;
+        letter-spacing: 0.5px;
+    }
+}

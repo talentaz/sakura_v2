@@ -12,6 +12,7 @@ use App\Models\Comments;
 use App\Models\User;
 use App\Models\Vehicle;
 use App\Models\OrderStatus;
+use App\Models\UserReview;
 use Notification;
 use App\Notifications\NewUserNotification;
 
@@ -186,9 +187,15 @@ class ContactController extends Controller
         // return back()->with('success', 'Thank you for your inquiry! We have sent you a quotation via email.');
     }
     public function company(Request $request){
+        $customer = UserReview::leftJoin('user_review_image', 'user_review.id', '=', 'user_review_image.user_review_id')
+                              ->groupBy('user_review.id')
+                              ->orderBy('user_review.id', 'desc')
+                              ->select('user_review.*', 'user_review_image.image')
+                              ->limit(3)  
+                              ->get(); 
 
         return view('front.pages.about.company', [
-
+            'customer' => $customer,
         ]);
     }
     public function agents(Request $request){
@@ -206,13 +213,13 @@ class ContactController extends Controller
     }
     public function gallery(Request $request){
         
-        return view('front.pages.gallery.index', [
+        return view('front.pages.about.gallery', [
 
         ]);
     }
     public function payment(Request $request){
         
-        return view('front.pages.payment.index', [
+        return view('front.pages.about.payment', [
 
         ]);
     }

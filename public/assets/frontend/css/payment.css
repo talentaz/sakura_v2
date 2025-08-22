@@ -1,37 +1,7 @@
-/* Hero Section */
-.hero {
-    height: 190px !important;
-}
-
-body {
-    background: #f5f5f5 !important;
-    font-family: "Arial", sans-serif;
-    margin: 0;
-    padding: 0;
-}
-
-/* Payment Header */
-.payment-header {
-    background: #e53e3e;
-    color: white;
-    text-align: center;
-    padding: 30px 0;
-    width: 100%;
-    margin-bottom: 0;
-}
-
-.payment-header h1 {
-    margin: 0;
-    font-size: 32px;
-    font-weight: bold;
-    letter-spacing: 2px;
-}
-
 /* Payment Content */
 .payment-content {
     padding: 40px 20px;
     background: #f5f5f5;
-    min-height: calc(100vh - 150px);
     display: flex;
     justify-content: center;
     align-items: flex-start;
@@ -118,10 +88,6 @@ body {
 
 /* Responsive Design */
 @media only screen and (max-width: 1440px) {
-    .hero {
-        height: 160px !important;
-    }
-
     .payment-content {
         padding: 30px 15px;
     }
@@ -158,35 +124,44 @@ body {
     .payment-content {
         padding: 20px 10px;
     }
-
+    .contact-info {
+        display: none;
+    }
     .card-header,
     .card-body {
         padding: 20px;
     }
 
-    .payment-header {
-        padding: 25px 0;
+    .page-header {
+        padding: 40px 0;
     }
 
-    .payment-header h1 {
-        font-size: 26px;
-        letter-spacing: 1.5px;
+    .page-header h1 {
+        font-size: 1.8rem;
+        letter-spacing: 1px;
     }
 
     .detail-row {
         flex-direction: column;
-        gap: 5px;
-        margin-bottom: 12px;
+        gap: 3px;
+        margin-bottom: 18px;
+        padding: 0;
     }
 
     .detail-row .label {
         min-width: auto;
-        font-weight: 500;
-        font-size: 13px;
+        font-weight: 400;
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 2px;
     }
 
     .detail-row .value {
-        font-size: 13px;
+        font-size: 14px;
+        color: #333;
+        font-weight: 400;
+        padding-left: 0;
+        line-height: 1.4;
     }
 }
 
@@ -200,12 +175,12 @@ body {
         padding: 15px;
     }
 
-    .payment-header {
-        padding: 20px 0;
+    .page-header {
+        padding: 30px 0;
     }
 
-    .payment-header h1 {
-        font-size: 22px;
+    .page-header h1 {
+        font-size: 1.5rem;
         letter-spacing: 1px;
     }
 
@@ -217,8 +192,18 @@ body {
         font-size: 12px;
     }
 
-    .detail-row .label,
+    .detail-row {
+        margin-bottom: 15px;
+        flex-direction: initial;
+    }
+
+    .detail-row .label {
+        width: 37%;
+        font-size: 13px;
+        margin-bottom: 2px;
+    }
+
     .detail-row .value {
-        font-size: 12px;
+        font-size: 13px;
     }
 }
